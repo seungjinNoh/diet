@@ -25,4 +25,5 @@ gradle.startParameter.excludedTaskNames.addAll(listOf(":build-logic:convention:t
 rootProject.name = "Diet"
 include(":app")
 include(":core:model")
+include(":core:navigation")
  
