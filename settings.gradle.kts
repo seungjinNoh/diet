@@ -26,4 +26,5 @@ rootProject.name = "Diet"
 include(":app")
 include(":core:model")
 include(":core:navigation")
+include(":core:database")
  
