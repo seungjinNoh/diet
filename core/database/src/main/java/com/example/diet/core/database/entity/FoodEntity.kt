@@ -9,6 +9,7 @@ data class FoodEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val name: String,
+    val emoji: String = "🍽️",       // 음식 이모지
     val servingSize: Float = 100f,  // 기준량 (g)
     val calories: Int,               // 기준량 당 칼로리
     @Embedded(prefix = "nutrition_")

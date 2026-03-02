@@ -12,6 +12,8 @@ fun MealEntity.toDomain(foodItems: List<FoodItemWithDetails>): Meal {
 
     return Meal(
         id = id,
+        mealType = mealType,
+        time = time,
         foods = foods,
         totalCalories = foods.sumOf { it.calories },
         totalNutrition = foods

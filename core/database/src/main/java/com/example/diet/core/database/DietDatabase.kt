@@ -12,6 +12,7 @@ import com.example.diet.core.database.entity.FoodEntity
 import com.example.diet.core.database.entity.MealEntity
 import com.example.diet.core.database.entity.MealFoodItem
 import com.example.diet.core.database.util.DateConverter
+import com.example.diet.core.database.util.MealTypeConverter
 
 @Database(
     entities = [
@@ -23,7 +24,7 @@ import com.example.diet.core.database.util.DateConverter
     version = 2,
     exportSchema = false
 )
-@TypeConverters(DateConverter::class)
+@TypeConverters(DateConverter::class, MealTypeConverter::class)
 abstract class DietDatabase : RoomDatabase() {
     abstract fun diaryDao(): DiaryDao
     abstract fun mealDao(): MealDao

@@ -12,6 +12,7 @@ fun FoodEntity.toDomain(): Food {
     return Food(
         id = id,
         name = name,
+        emoji = emoji,
         amount = servingSize,
         calories = calories,
         nutrition = nutrition.toDomain()
@@ -28,6 +29,7 @@ fun FoodItemWithDetails.toDomain(): Food {
     return Food(
         id = food.id,
         name = food.name,
+        emoji = food.emoji,
         amount = item.amount,
         calories = (food.calories * ratio).toInt(),
         nutrition = NutritionInfo(
@@ -46,6 +48,7 @@ fun Food.toEntity(): FoodEntity {
     return FoodEntity(
         id = id,
         name = name,
+        emoji = emoji,
         servingSize = amount,
         calories = calories,
         nutrition = nutrition.toEntity()
