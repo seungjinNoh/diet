@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diet App - Analysis</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: #fff;
+    border-radius: 48px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+    overflow: hidden;
+    position: relative;
+    border: 10px solid #1a1a1a;
+  }
+  .status-bar {
+    background: #fff;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 700; }
+  .screen {
+    height: calc(844px - 44px - 82px);
+    overflow-y: auto;
+    background: #FAFAFA;
+    scrollbar-width: none;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  .top-bar {
+    background: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .top-bar .title { font-size: 20px; font-weight: 800; color: #1a1a1a; }
+
+  /* Tab Selector */
+  .tab-selector {
+    background: #fff;
+    padding: 12px 16px;
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .tab {
+    flex: 1; padding: 8px;
+    text-align: center;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #aaa;
+    cursor: pointer;
+  }
+  .tab.active {
+    background: #4CAF50;
+    color: #fff;
+  }
+
+  /* Summary Cards */
+  .summary-row {
+    display: flex;
+    gap: 10px;
+    margin: 12px 16px;
+  }
+  .summary-card {
+    flex: 1;
+    background: #fff;
+    border-radius: 16px;
+    padding: 14px 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+  .summary-card .s-label { font-size: 11px; color: #aaa; font-weight: 500; margin-bottom: 6px; }
+  .summary-card .s-val { font-size: 18px; font-weight: 800; color: #1a1a1a; }
+  .summary-card .s-unit { font-size: 11px; color: #888; margin-top: 2px; }
+  .summary-card.green .s-val { color: #4CAF50; }
+  .summary-card.orange .s-val { color: #FF9800; }
+  .summary-card.red .s-val { color: #F44336; }
+
+  /* Section Card */
+  .section-card {
+    background: #fff;
+    margin: 0 16px 12px;
+    border-radius: 20px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .section-title { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .section-sub { font-size: 12px; color: #aaa; }
+
+  /* Weekly Bar Chart */
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 100px;
+    margin-bottom: 6px;
+  }
+  .bar-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .bar-val { font-size: 9px; color: #aaa; font-weight: 600; }
+  .bar {
+    width: 100%;
+    border-radius: 6px 6px 0 0;
+  }
+  .bar.achieved { background: #4CAF50; }
+  .bar.over { background: #FF5722; }
+  .bar.today { background: #4CAF50; box-shadow: 0 0 8px rgba(76,175,80,0.4); }
+  .bar.empty { background: #f0f0f0; }
+  .bar-day { font-size: 10px; color: #aaa; font-weight: 500; }
+  .bar-day.today-label { color: #4CAF50; font-weight: 700; }
+
+  /* Goal line */
+  .chart-wrap { position: relative; }
+  .goal-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    border-top: 1.5px dashed #FF9800;
+    bottom: 24px;
+    top: 24px; /* 2000kcal at 80% of 100px chart */
+  }
+  .goal-label {
+    position: absolute;
+    right: 0;
+    top: 18px;
+    font-size: 9px;
+    color: #FF9800;
+    font-weight: 600;
+    background: #fff;
+    padding: 0 3px;
+  }
+
+  /* Macro Pie */
+  .macro-pie-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .pie-wrap { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+  .pie-wrap svg { width: 100px; height: 100px; }
+  .pie-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .pie-center .pc-val { font-size: 16px; font-weight: 800; color: #1a1a1a; }
+  .pie-center .pc-lbl { font-size: 10px; color: #aaa; }
+
+  .pie-legend { flex: 1; }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .legend-item:last-child { margin-bottom: 0; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-name { font-size: 12px; color: #555; flex: 1; font-weight: 500; }
+  .legend-pct { font-size: 12px; font-weight: 700; color: #1a1a1a; }
+  .legend-gram { font-size: 11px; color: #aaa; }
+
+  /* Monthly Heatmap */
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .heatmap-day-label {
+    text-align: center;
+    font-size: 10px;
+    color: #aaa;
+    font-weight: 600;
+    padding-bottom: 4px;
+  }
+  .heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .heatmap-cell.empty { background: transparent; color: transparent; }
+  .heatmap-cell.no-data { background: #f5f5f5; color: #ddd; }
+  .heatmap-cell.low { background: #C8E6C9; color: #2E7D32; }
+  .heatmap-cell.mid { background: #81C784; color: #1B5E20; }
+  .heatmap-cell.high { background: #4CAF50; color: #fff; }
+  .heatmap-cell.over { background: #FF8A65; color: #fff; }
+  .heatmap-cell.today-cell { background: #4CAF50; color: #fff; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #4CAF50; }
+
+  /* Top Foods */
+  .top-food-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f8f8f8;
+  }
+  .top-food-item:last-child { border-bottom: none; }
+  .rank {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    background: #f5f5f5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #888;
+    flex-shrink: 0;
+  }
+  .rank.gold { background: #FFF3E0; color: #FF9800; }
+  .rank.silver { background: #F5F5F5; color: #9E9E9E; }
+  .rank.bronze { background: #EFEBE9; color: #795548; }
+  .tf-icon { font-size: 18px; flex-shrink: 0; }
+  .tf-name { flex: 1; font-size: 13px; font-weight: 600; color: #333; }
+  .tf-count { font-size: 12px; color: #aaa; font-weight: 500; }
+  .tf-bar-wrap {
+    width: 60px; height: 6px;
+    background: #f0f0f0; border-radius: 3px; overflow: hidden;
+  }
+  .tf-bar { height: 100%; background: #4CAF50; border-radius: 3px; }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    height: 82px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: 16px;
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .nav-icon svg { width: 24px; height: 24px; fill: none; }
+  .nav-label { font-size: 11px; font-weight: 500; color: #bbb; }
+  .nav-item.active .nav-label { color: #4CAF50; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span style="font-size:12px;color:#888">●●●</span>
+  </div>
+
+  <div class="screen">
+    <div class="top-bar">
+      <div class="title">영양 분석</div>
+      <div style="font-size:12px;color:#4CAF50;font-weight:700;background:#E8F5E9;padding:5px 12px;border-radius:20px">2월</div>
+    </div>
+
+    <!-- Tab -->
+    <div class="tab-selector">
+      <div class="tab active">주간</div>
+      <div class="tab">월간</div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-row">
+      <div class="summary-card green">
+        <div class="s-label">평균 칼로리</div>
+        <div class="s-val">1,820</div>
+        <div class="s-unit">kcal / 일</div>
+      </div>
+      <div class="summary-card orange">
+        <div class="s-label">목표 달성</div>
+        <div class="s-val">5/7</div>
+        <div class="s-unit">일 달성</div>
+      </div>
+      <div class="summary-card">
+        <div class="s-label">총 섭취</div>
+        <div class="s-val">12,740</div>
+        <div class="s-unit">kcal 이번주</div>
+      </div>
+    </div>
+
+    <!-- Weekly Bar Chart -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">주간 칼로리</div>
+        <div class="section-sub">목표 2,000 kcal</div>
+      </div>
+      <div class="chart-wrap">
+        <div class="goal-label">목표</div>
+        <div class="goal-line"></div>
+        <div class="bar-chart">
+          <div class="bar-group">
+            <div class="bar-val">1,950</div>
+            <div class="bar achieved" style="height:78px"></div>
+            <div class="bar-day">월</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-val">2,310</div>
+            <div class="bar over" style="height:92px"></div>
+            <div class="bar-day">화</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-val">1,780</div>
+            <div class="bar achieved" style="height:71px"></div>
+            <div class="bar-day">수</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-val">2,050</div>
+            <div class="bar over" style="height:82px"></div>
+            <div class="bar-day">목</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-val">1,240</div>
+            <div class="bar today" style="height:50px"></div>
+            <div class="bar-day today-label">오늘</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-val"></div>
+            <div class="bar empty" style="height:4px"></div>
+            <div class="bar-day">토</div>
+          </div>
+          <div class="bar-group">
+            <div class="bar-val"></div>
+            <div class="bar empty" style="height:4px"></div>
+            <div class="bar-day">일</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Macro Pie -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">매크로 비율</div>
+        <div class="section-sub">이번 주 평균</div>
+      </div>
+      <div class="macro-pie-row">
+        <div class="pie-wrap">
+          <svg viewBox="0 0 36 36">
+            <!-- carb 52% -->
+            <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#FF9800" stroke-width="3.2"
+              stroke-dasharray="52 48" stroke-dashoffset="25" transform="rotate(-90 18 18)"/>
+            <!-- protein 28% -->
+            <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#2196F3" stroke-width="3.2"
+              stroke-dasharray="28 72" stroke-dashoffset="-27" transform="rotate(-90 18 18)"/>
+            <!-- fat 20% -->
+            <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#F44336" stroke-width="3.2"
+              stroke-dasharray="20 80" stroke-dashoffset="-55" transform="rotate(-90 18 18)"/>
+          </svg>
+          <div class="pie-center">
+            <div class="pc-val">1,820</div>
+            <div class="pc-lbl">kcal</div>
+          </div>
+        </div>
+        <div class="pie-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#FF9800"></div>
+            <div class="legend-name">탄수화물</div>
+            <div class="legend-gram">238g</div>
+            <div class="legend-pct" style="color:#FF9800">52%</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#2196F3"></div>
+            <div class="legend-name">단백질</div>
+            <div class="legend-gram">128g</div>
+            <div class="legend-pct" style="color:#2196F3">28%</div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#F44336"></div>
+            <div class="legend-name">지방</div>
+            <div class="legend-gram">40g</div>
+            <div class="legend-pct" style="color:#F44336">20%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top 5 Foods -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">자주 먹은 음식 TOP 5</div>
+        <div class="section-sub">이번 주</div>
+      </div>
+      <div class="top-food-item">
+        <div class="rank gold">1</div>
+        <div class="tf-icon">🍗</div>
+        <div class="tf-name">닭가슴살</div>
+        <div class="tf-count">6회</div>
+        <div class="tf-bar-wrap"><div class="tf-bar" style="width:100%"></div></div>
+      </div>
+      <div class="top-food-item">
+        <div class="rank silver">2</div>
+        <div class="tf-icon">🌾</div>
+        <div class="tf-name">잡곡밥</div>
+        <div class="tf-count">5회</div>
+        <div class="tf-bar-wrap"><div class="tf-bar" style="width:83%"></div></div>
+      </div>
+      <div class="top-food-item">
+        <div class="rank bronze">3</div>
+        <div class="tf-icon">🥚</div>
+        <div class="tf-name">계란</div>
+        <div class="tf-count">4회</div>
+        <div class="tf-bar-wrap"><div class="tf-bar" style="width:66%"></div></div>
+      </div>
+      <div class="top-food-item">
+        <div class="rank">4</div>
+        <div class="tf-icon">🥦</div>
+        <div class="tf-name">브로콜리</div>
+        <div class="tf-count">3회</div>
+        <div class="tf-bar-wrap"><div class="tf-bar" style="width:50%"></div></div>
+      </div>
+      <div class="top-food-item">
+        <div class="rank">5</div>
+        <div class="tf-icon">🍠</div>
+        <div class="tf-name">고구마</div>
+        <div class="tf-count">3회</div>
+        <div class="tf-bar-wrap"><div class="tf-bar" style="width:50%"></div></div>
+      </div>
+    </div>
+
+    <!-- Monthly Heatmap Preview -->
+    <div class="section-card">
+      <div class="section-header">
+        <div class="section-title">월간 달성 히트맵</div>
+        <div class="section-sub">2025년 2월</div>
+      </div>
+      <div class="heatmap-grid">
+        <div class="heatmap-day-label">일</div>
+        <div class="heatmap-day-label">월</div>
+        <div class="heatmap-day-label">화</div>
+        <div class="heatmap-day-label">수</div>
+        <div class="heatmap-day-label">목</div>
+        <div class="heatmap-day-label">금</div>
+        <div class="heatmap-day-label">토</div>
+
+        <!-- Week 1 - Feb starts Saturday -->
+        <div class="heatmap-cell empty">-</div>
+        <div class="heatmap-cell empty">-</div>
+        <div class="heatmap-cell empty">-</div>
+        <div class="heatmap-cell empty">-</div>
+        <div class="heatmap-cell empty">-</div>
+        <div class="heatmap-cell empty">-</div>
+        <div class="heatmap-cell high">1</div>
+
+        <!-- Week 2 -->
+        <div class="heatmap-cell mid">2</div>
+        <div class="heatmap-cell low">3</div>
+        <div class="heatmap-cell high">4</div>
+        <div class="heatmap-cell over">5</div>
+        <div class="heatmap-cell high">6</div>
+        <div class="heatmap-cell mid">7</div>
+        <div class="heatmap-cell low">8</div>
+
+        <!-- Week 3 -->
+        <div class="heatmap-cell high">9</div>
+        <div class="heatmap-cell high">10</div>
+        <div class="heatmap-cell mid">11</div>
+        <div class="heatmap-cell over">12</div>
+        <div class="heatmap-cell high">13</div>
+        <div class="heatmap-cell low">14</div>
+        <div class="heatmap-cell high">15</div>
+
+        <!-- Week 4 -->
+        <div class="heatmap-cell mid">16</div>
+        <div class="heatmap-cell high">17</div>
+        <div class="heatmap-cell over">18</div>
+        <div class="heatmap-cell high">19</div>
+        <div class="heatmap-cell mid">20</div>
+        <div class="heatmap-cell high">21</div>
+        <div class="heatmap-cell low">22</div>
+
+        <!-- Week 5 -->
+        <div class="heatmap-cell high">23</div>
+        <div class="heatmap-cell mid">24</div>
+        <div class="heatmap-cell over">25</div>
+        <div class="heatmap-cell high">26</div>
+        <div class="heatmap-cell mid">27</div>
+        <div class="heatmap-cell today-cell">28</div>
+        <div class="heatmap-cell no-data">-</div>
+      </div>
+      <!-- Legend -->
+      <div style="display:flex;gap:12px;margin-top:12px;justify-content:center">
+        <div style="display:flex;align-items:center;gap:4px">
+          <div style="width:10px;height:10px;border-radius:3px;background:#C8E6C9"></div>
+          <span style="font-size:10px;color:#aaa">미달</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <div style="width:10px;height:10px;border-radius:3px;background:#4CAF50"></div>
+          <span style="font-size:10px;color:#aaa">달성</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <div style="width:10px;height:10px;border-radius:3px;background:#FF8A65"></div>
+          <span style="font-size:10px;color:#aaa">초과</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:16px"></div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:#bbb">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <div class="nav-label">홈</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:#bbb">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <div class="nav-label">식단</div>
+    </div>
+    <div class="nav-item active">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" style="stroke:#4CAF50">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+      </div>
+      <div class="nav-label">분석</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" style="stroke:#bbb">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+      <div class="nav-label">설정</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diet App Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #ECEFF1;
+    min-height: 100vh;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 20px 60px;
+  }
+
+  h1 { font-size: 22px; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 24px; }
+
+  /* 상단 화면 선택 탭 */
+  .screen-tabs {
+    display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .screen-tab {
+    padding: 7px 16px; border-radius: 20px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    background: #fff; color: #888;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+  .screen-tab:hover { color: #4CAF50; border-color: #C8E6C9; }
+  .screen-tab.active { background: #4CAF50; color: #fff; box-shadow: 0 4px 14px rgba(76,175,80,0.3); }
+
+  /* Phone frame */
+  .phone {
+    width: 390px; height: 844px;
+    background: #fff; border-radius: 48px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.22);
+    overflow: hidden; position: relative;
+    border: 10px solid #1a1a1a;
+    flex-shrink: 0;
+  }
+
+  /* 화면 전환 */
+  .view { display: none; flex-direction: column; height: 100%; }
+  .view.active { display: flex; }
+
+  /* ───── 공통 ───── */
+  .status-bar {
+    background: #fff; height: 44px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+
+  .scroll-area {
+    flex: 1; overflow-y: auto; background: #FAFAFA; scrollbar-width: none;
+  }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  .top-bar {
+    background: #fff; padding: 12px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+  }
+  .top-bar .title { font-size: 20px; font-weight: 800; color: #1a1a1a; }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: #f5f5f5; display: flex; align-items: center; justify-content: center;
+  }
+  .icon-btn svg { width: 20px; height: 20px; stroke: #555; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+  .section-card {
+    background: #fff; margin: 12px 16px; border-radius: 20px;
+    padding: 16px 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  .section-title { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .section-sub { font-size: 12px; color: #aaa; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .section-label-sm {
+    font-size: 11px; font-weight: 700; color: #aaa;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 0 0 8px; margin-bottom: 0;
+  }
+
+  /* ── Bottom Nav ── */
+  .bottom-nav {
+    height: 82px; background: #fff;
+    border-top: 1px solid #f0f0f0; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-around; padding-bottom: 16px;
+    position: relative; z-index: 12;
+  }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; cursor: pointer;
+  }
+  .nav-icon svg { width: 24px; height: 24px; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-label { font-size: 11px; font-weight: 500; color: #bbb; }
+  .nav-item.active .nav-label { color: #4CAF50; font-weight: 700; }
+  .nav-item.active .nav-icon svg { stroke: #4CAF50; }
+  .nav-item:not(.active) .nav-icon svg { stroke: #bbb; }
+
+  /* ═══════════════════════════════
+     HOME
+  ═══════════════════════════════ */
+  .calorie-section { background: #fff; margin: 12px 16px; border-radius: 20px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .ring-container { display: flex; align-items: center; gap: 20px; }
+  .ring-wrap { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+  .ring-wrap svg { width: 120px; height: 120px; transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: #f0f0f0; stroke-width: 10; }
+  .ring-fill { fill: none; stroke: #4CAF50; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 283; stroke-dashoffset: 90; }
+  .ring-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .ring-center .kcal-num { font-size: 22px; font-weight: 800; color: #1a1a1a; }
+  .ring-center .kcal-label { font-size: 10px; color: #aaa; }
+  .calorie-info { flex: 1; }
+  .calorie-goal { display: flex; justify-content: space-between; margin-bottom: 12px; }
+  .calorie-item { text-align: center; }
+  .calorie-item .val { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .calorie-item .lbl { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .calorie-item.consumed .val { color: #4CAF50; }
+  .calorie-item.remain .val { color: #FF9800; }
+  .divider-v { width: 1px; background: #f0f0f0; }
+  .chip { display: inline-block; background: #E8F5E9; color: #4CAF50; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+
+  .macro-section { background: #fff; margin: 0 16px 12px; border-radius: 20px; padding: 16px 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .macro-row { display: flex; align-items: center; margin-bottom: 12px; gap: 10px; }
+  .macro-row:last-child { margin-bottom: 0; }
+  .macro-name { width: 28px; font-size: 12px; font-weight: 600; color: #555; }
+  .macro-bar-wrap { flex: 1; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
+  .macro-bar { height: 100%; border-radius: 4px; }
+  .macro-val { font-size: 12px; font-weight: 600; color: #555; width: 52px; text-align: right; }
+
+  .meals-section { margin: 0 16px 12px; }
+  .meals-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 0 4px; }
+  .meals-header span { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .meals-header a { font-size: 12px; color: #4CAF50; font-weight: 600; }
+  .meal-card { background: #fff; border-radius: 16px; padding: 14px 16px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 12px; }
+  .meal-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .meal-icon.breakfast { background: #FFF3E0; }
+  .meal-icon.lunch { background: #E8F5E9; }
+  .meal-info { flex: 1; }
+  .meal-name { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+  .meal-foods { font-size: 12px; color: #aaa; margin-top: 2px; }
+  .meal-kcal { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .meal-kcal span { font-size: 11px; color: #aaa; font-weight: 400; }
+  .meal-add { background: #f8f8f8; border-radius: 16px; padding: 14px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; border: 2px dashed #e0e0e0; }
+  .meal-add .add-icon { width: 42px; height: 42px; border-radius: 12px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #bbb; }
+  .meal-add .add-text { font-size: 14px; color: #bbb; font-weight: 500; }
+
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; }
+  .bar-group { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { width: 100%; border-radius: 6px 6px 0 0; }
+  .bar.achieved { background: #4CAF50; }
+  .bar.over { background: #FF5722; }
+  .bar.today { background: #4CAF50; box-shadow: 0 0 8px rgba(76,175,80,0.5); }
+  .bar.empty { background: #f0f0f0; }
+  .bar-day { font-size: 10px; color: #aaa; font-weight: 500; }
+  .bar-day.today-label { color: #4CAF50; font-weight: 700; }
+
+  .home-greeting { font-size: 13px; color: #888; }
+  .home-date { font-size: 18px; font-weight: 700; color: #1a1a1a; }
+  .home-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #4CAF50, #8BC34A); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 16px; }
+
+  /* ═══════════════════════════════
+     DIARY
+  ═══════════════════════════════ */
+  .week-calendar { background: #fff; padding: 12px 16px; display: flex; gap: 6px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; }
+  .day-cell { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; border-radius: 12px; cursor: pointer; }
+  .day-cell.active { background: #4CAF50; }
+  .day-cell .day-name { font-size: 10px; color: #aaa; font-weight: 600; }
+  .day-cell.active .day-name { color: rgba(255,255,255,0.8); }
+  .day-cell .day-num { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .day-cell.active .day-num { color: #fff; }
+  .day-cell .dot { width: 5px; height: 5px; border-radius: 50%; background: #4CAF50; }
+  .day-cell.active .dot { background: rgba(255,255,255,0.6); }
+  .day-cell .dot.empty { background: transparent; }
+  .date-header { padding: 14px 20px 8px; display: flex; justify-content: space-between; align-items: center; }
+  .date-header .date-text { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+  .date-header .total-kcal { font-size: 13px; color: #4CAF50; font-weight: 700; background: #E8F5E9; padding: 4px 12px; border-radius: 20px; }
+  .meal-block { background: #fff; margin: 0 16px 10px; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .meal-block-header { padding: 14px 16px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f8f8f8; }
+  .meal-block-left { display: flex; align-items: center; gap: 10px; }
+  .meal-emoji { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .meal-emoji.breakfast { background: #FFF3E0; }
+  .meal-emoji.lunch { background: #E8F5E9; }
+  .meal-emoji.dinner { background: #E3F2FD; }
+  .meal-title { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .meal-subtitle { font-size: 11px; color: #aaa; margin-top: 1px; }
+  .meal-kcal-badge { font-size: 14px; font-weight: 700; color: #555; }
+  .meal-kcal-badge span { font-size: 11px; color: #aaa; font-weight: 400; }
+  .food-item { padding: 10px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f8f8f8; }
+  .food-item:last-child { border-bottom: none; }
+  .food-color-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .food-name-wrap { flex: 1; }
+  .food-name { font-size: 13px; font-weight: 600; color: #333; }
+  .food-amount { font-size: 11px; color: #aaa; margin-top: 1px; }
+  .food-kcal { font-size: 13px; font-weight: 700; color: #555; }
+  .add-food-btn { padding: 10px 16px; display: flex; align-items: center; gap: 8px; color: #4CAF50; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .add-food-btn .plus { width: 22px; height: 22px; border-radius: 50%; background: #E8F5E9; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .meal-empty { background: #fff; margin: 0 16px 10px; border-radius: 20px; border: 2px dashed #e8e8e8; padding: 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .meal-empty-icon { width: 36px; height: 36px; border-radius: 10px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .meal-empty-text .name { font-size: 14px; font-weight: 600; color: #ccc; }
+  .meal-empty-text .hint { font-size: 11px; color: #ddd; margin-top: 2px; }
+
+  /* FAB */
+  .fab {
+    position: absolute; bottom: 98px; right: 20px;
+    width: 52px; height: 52px; border-radius: 16px;
+    background: #4CAF50; box-shadow: 0 4px 16px rgba(76,175,80,0.4);
+    display: flex; align-items: center; justify-content: center; z-index: 5; cursor: pointer;
+  }
+  .fab svg { width: 24px; height: 24px; stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; }
+
+  /* Dim */
+  .dim-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.35); z-index: 9;
+    display: none;
+  }
+  .dim-overlay.show { display: block; }
+
+  /* Bottom Sheet */
+  .bottom-sheet {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: #fff; border-radius: 24px 24px 0 0;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.12); z-index: 11;
+    padding: 0 16px 98px;
+    transform: translateY(100%); transition: transform 0.3s ease;
+  }
+  .bottom-sheet.show { transform: translateY(0); }
+  .bs-handle { width: 36px; height: 4px; background: #e0e0e0; border-radius: 2px; margin: 10px auto 12px; }
+  .bs-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .bs-title { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .bs-subtitle { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .bs-new-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: #E8F5E9; color: #4CAF50; font-size: 12px; font-weight: 700;
+    padding: 6px 12px; border-radius: 10px; cursor: pointer;
+  }
+  .bs-new-btn svg { width: 14px; height: 14px; stroke: #4CAF50; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+  .search-box { display: flex; align-items: center; background: #f5f5f5; border-radius: 12px; padding: 10px 14px; gap: 8px; margin-bottom: 12px; }
+  .search-box svg { width: 18px; height: 18px; stroke: #aaa; flex-shrink: 0; fill: none; stroke-width: 2; stroke-linecap: round; }
+  .search-box span { font-size: 14px; color: #aaa; }
+  .search-result { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f5; gap: 12px; }
+  .search-result:last-child { border-bottom: none; }
+  .sr-icon { width: 36px; height: 36px; border-radius: 10px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .sr-info { flex: 1; }
+  .sr-name { font-size: 13px; font-weight: 600; color: #333; }
+  .sr-detail { font-size: 11px; color: #aaa; margin-top: 1px; }
+  .sr-add { width: 28px; height: 28px; border-radius: 8px; background: #4CAF50; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: 300; cursor: pointer; }
+
+  /* ═══════════════════════════════
+     ANALYSIS
+  ═══════════════════════════════ */
+  .tab-selector { background: #fff; padding: 12px 16px; display: flex; gap: 8px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; }
+  .atab { flex: 1; padding: 8px; text-align: center; border-radius: 10px; font-size: 13px; font-weight: 600; color: #aaa; cursor: pointer; }
+  .atab.active { background: #4CAF50; color: #fff; }
+  .summary-row { display: flex; gap: 10px; margin: 12px 16px; }
+  .summary-card { flex: 1; background: #fff; border-radius: 16px; padding: 14px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: center; }
+  .s-label { font-size: 11px; color: #aaa; font-weight: 500; margin-bottom: 6px; }
+  .s-val { font-size: 18px; font-weight: 800; color: #1a1a1a; }
+  .s-val.green { color: #4CAF50; }
+  .s-val.orange { color: #FF9800; }
+  .s-unit { font-size: 11px; color: #888; margin-top: 2px; }
+  .macro-pie-row { display: flex; align-items: center; gap: 16px; }
+  .pie-wrap { position: relative; width: 100px; height: 100px; flex-shrink: 0; }
+  .pie-wrap svg { width: 100px; height: 100px; }
+  .pie-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+  .pie-center .pc-val { font-size: 16px; font-weight: 800; color: #1a1a1a; }
+  .pie-center .pc-lbl { font-size: 10px; color: #aaa; }
+  .pie-legend { flex: 1; }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .legend-item:last-child { margin-bottom: 0; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-name { font-size: 12px; color: #555; flex: 1; font-weight: 500; }
+  .legend-pct { font-size: 12px; font-weight: 700; color: #1a1a1a; }
+  .legend-gram { font-size: 11px; color: #aaa; }
+  .heatmap-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .heatmap-day-label { text-align: center; font-size: 10px; color: #aaa; font-weight: 600; padding-bottom: 4px; }
+  .heatmap-cell { aspect-ratio: 1; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; }
+  .heatmap-cell.empty { background: transparent; color: transparent; }
+  .heatmap-cell.no-data { background: #f5f5f5; color: #ddd; }
+  .heatmap-cell.low { background: #C8E6C9; color: #2E7D32; }
+  .heatmap-cell.mid { background: #81C784; color: #1B5E20; }
+  .heatmap-cell.high { background: #4CAF50; color: #fff; }
+  .heatmap-cell.over { background: #FF8A65; color: #fff; }
+  .heatmap-cell.today-cell { background: #4CAF50; color: #fff; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #4CAF50; }
+  .top-food-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f8f8f8; }
+  .top-food-item:last-child { border-bottom: none; }
+  .rank { width: 22px; height: 22px; border-radius: 6px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #888; flex-shrink: 0; }
+  .rank.gold { background: #FFF3E0; color: #FF9800; }
+  .rank.silver { background: #F5F5F5; color: #9E9E9E; }
+  .rank.bronze { background: #EFEBE9; color: #795548; }
+  .tf-icon { font-size: 18px; flex-shrink: 0; }
+  .tf-name { flex: 1; font-size: 13px; font-weight: 600; color: #333; }
+  .tf-count { font-size: 12px; color: #aaa; font-weight: 500; }
+  .tf-bar-wrap { width: 60px; height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
+  .tf-bar { height: 100%; background: #4CAF50; border-radius: 3px; }
+
+  /* ═══════════════════════════════
+     SETTINGS
+  ═══════════════════════════════ */
+  .profile-card { background: linear-gradient(135deg, #4CAF50, #8BC34A); margin: 12px 16px; border-radius: 20px; padding: 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 20px rgba(76,175,80,0.3); }
+  .profile-avatar { width: 58px; height: 58px; border-radius: 18px; background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: #fff; border: 2px solid rgba(255,255,255,0.5); flex-shrink: 0; }
+  .profile-info .pname { font-size: 17px; font-weight: 700; color: #fff; }
+  .profile-info .pemail { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 2px; }
+  .profile-edit { margin-left: auto; background: rgba(255,255,255,0.2); border-radius: 10px; padding: 6px 12px; font-size: 12px; font-weight: 600; color: #fff; }
+  .stats-row { display: flex; gap: 10px; margin: 0 16px 12px; }
+  .stat-card { flex: 1; background: #fff; border-radius: 14px; padding: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .stat-val { font-size: 17px; font-weight: 800; color: #1a1a1a; }
+  .stat-lbl { font-size: 10px; color: #aaa; margin-top: 3px; font-weight: 500; }
+  .settings-group { background: #fff; margin: 0 16px 12px; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .settings-item { display: flex; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f8f8f8; gap: 12px; }
+  .settings-item:last-child { border-bottom: none; }
+  .item-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .item-content { flex: 1; }
+  .item-title { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+  .item-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .item-right { display: flex; align-items: center; gap: 6px; }
+  .item-val { font-size: 13px; color: #888; font-weight: 500; }
+  .chevron svg { width: 16px; height: 16px; stroke: #ccc; stroke-width: 2.5; fill: none; }
+  .toggle { width: 44px; height: 24px; border-radius: 12px; background: #4CAF50; position: relative; flex-shrink: 0; }
+  .toggle.off { background: #e0e0e0; }
+  .toggle::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff; top: 2px; right: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+  .toggle.off::after { right: auto; left: 2px; }
+  .slider-wrap { margin: 0 16px 12px; background: #fff; border-radius: 16px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .slider-title { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+  .slider-val { font-size: 16px; font-weight: 800; color: #4CAF50; }
+  .slider-unit { font-size: 12px; color: #aaa; }
+  .slider-track { height: 6px; background: #f0f0f0; border-radius: 3px; position: relative; margin-bottom: 8px; }
+  .slider-fill { height: 100%; background: #4CAF50; border-radius: 3px; width: 60%; }
+  .slider-thumb { position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 3px solid #4CAF50; top: 50%; left: 60%; transform: translate(-50%,-50%); box-shadow: 0 2px 8px rgba(76,175,80,0.3); }
+  .slider-labels { display: flex; justify-content: space-between; font-size: 10px; color: #ccc; }
+  .macro-goal-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .macro-goal-row:last-child { margin-bottom: 0; }
+  .mg-name { width: 32px; font-size: 12px; font-weight: 600; color: #555; }
+  .mg-track { flex: 1; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
+  .mg-fill { height: 100%; border-radius: 4px; }
+  .mg-val { font-size: 12px; font-weight: 600; width: 40px; text-align: right; color: #888; }
+
+  /* ═══════════════════════════════
+     FOOD CUSTOM
+  ═══════════════════════════════ */
+  .back-top-bar {
+    background: #fff; padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
+  }
+  .back-btn { width: 32px; height: 32px; border-radius: 9px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .back-btn svg { width: 17px; height: 17px; stroke: #555; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .back-top-bar .btitle { font-size: 16px; font-weight: 800; color: #1a1a1a; flex: 1; }
+  .save-btn-top { font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 10px; }
+  .save-btn-top.active { background: #4CAF50; color: #fff; }
+  .save-btn-top.disabled { background: #f0f0f0; color: #ccc; }
+
+  .register-banner { margin: 10px 16px 6px; background: #F1F8E9; border: 1.5px solid #A5D6A7; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .rb-icon { width: 36px; height: 36px; border-radius: 10px; background: #4CAF50; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(76,175,80,0.3); }
+  .rb-text { flex: 1; }
+  .rb-title { font-size: 13px; font-weight: 700; color: #2E7D32; }
+  .rb-sub { font-size: 11px; color: #81C784; margin-top: 2px; }
+  .rb-chevron svg { width: 16px; height: 16px; stroke: #A5D6A7; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+  .section-label-food { font-size: 11px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.6px; padding: 8px 16px 5px; }
+  .food-list-item { display: flex; align-items: center; padding: 10px 16px; gap: 12px; background: #fff; border-bottom: 1px solid #f5f5f5; }
+  .fli-icon { width: 36px; height: 36px; border-radius: 10px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .fli-info { flex: 1; }
+  .fli-name { font-size: 13px; font-weight: 600; color: #333; }
+  .fli-detail { font-size: 11px; color: #aaa; margin-top: 1px; }
+  .fli-add { width: 28px; height: 28px; border-radius: 8px; background: #4CAF50; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: 300; cursor: pointer; }
+
+  /* Food Register Form */
+  .form-wrap { padding: 16px 16px; }
+  .emoji-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .emoji-big { width: 56px; height: 56px; border-radius: 16px; background: #F1F8E9; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; border: 2px dashed #A5D6A7; }
+  .emoji-big.selected { border-style: solid; border-color: #4CAF50; }
+  .emoji-hint strong { font-size: 12px; color: #4CAF50; display: block; margin-bottom: 2px; }
+  .emoji-hint span { font-size: 11px; color: #aaa; }
+  .input-group { margin-bottom: 14px; }
+  .input-label { font-size: 11px; font-weight: 700; color: #777; margin-bottom: 6px; display: flex; align-items: center; gap: 3px; }
+  .req { color: #F44336; font-size: 13px; }
+  .input-field { width: 100%; padding: 11px 13px; background: #f8f8f8; border: 1.5px solid #f0f0f0; border-radius: 11px; font-size: 13px; color: #1a1a1a; display: flex; align-items: center; justify-content: space-between; }
+  .input-field.focused { border-color: #4CAF50; background: #fff; }
+  .input-field.filled { border-color: #E0E0E0; background: #fff; }
+  .input-field .val { font-weight: 600; }
+  .input-field .unit { font-size: 11px; color: #aaa; }
+  .two-col { display: flex; gap: 10px; }
+  .two-col .input-group { flex: 1; }
+  .kcal-auto { width: 100%; padding: 11px 13px; border: 1.5px solid #C8E6C9; background: #F1F8E9; border-radius: 11px; display: flex; align-items: center; justify-content: space-between; }
+  .kcal-auto .val { font-size: 15px; font-weight: 800; color: #4CAF50; }
+  .kcal-auto .unit { font-size: 11px; color: #81C784; }
+  .kcal-auto.empty { border-color: #f0f0f0; background: #f8f8f8; }
+  .kcal-auto.empty .val { color: #ccc; font-size: 13px; font-weight: 400; }
+  .macro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .macro-card { background: #f8f8f8; border: 1.5px solid #f0f0f0; border-radius: 11px; padding: 10px 12px; }
+  .macro-card.focused { border-color: #4CAF50; background: #fff; }
+  .macro-card.filled-carb { border-color: #FF9800; background: #fff; }
+  .macro-card.filled-prot { border-color: #2196F3; background: #fff; }
+  .macro-card.filled-fat  { border-color: #F44336; background: #fff; }
+  .macro-card.filled-fib  { border-color: #9C27B0; background: #fff; }
+  .mc-label { font-size: 10px; font-weight: 700; display: flex; align-items: center; gap: 3px; margin-bottom: 6px; }
+  .mc-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .mc-val-row { display: flex; align-items: baseline; gap: 2px; }
+  .mc-val { font-size: 16px; font-weight: 800; color: #1a1a1a; }
+  .mc-empty { font-size: 13px; color: #ccc; }
+  .mc-unit { font-size: 10px; color: #aaa; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .mc-cursor { width: 1.5px; height: 16px; background: #4CAF50; display: inline-block; animation: blink 1s infinite; }
+  .calc-hint { background: #f8f8f8; border-radius: 10px; padding: 10px 13px; display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .calc-hint svg { width: 15px; height: 15px; stroke: #aaa; fill: none; flex-shrink: 0; }
+  .calc-hint span { font-size: 11px; color: #aaa; }
+  .calc-active { background: linear-gradient(135deg, #4CAF50, #66BB6A); }
+  .calc-active span { color: rgba(255,255,255,0.9); font-weight: 600; }
+  .calc-active svg { stroke: rgba(255,255,255,0.8); }
+  .save-full { width: 100%; padding: 14px; border-radius: 13px; text-align: center; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .save-full.active { background: #4CAF50; color: #fff; box-shadow: 0 4px 14px rgba(76,175,80,0.3); cursor: pointer; }
+  .save-full.disabled { background: #f0f0f0; color: #ccc; }
+  .save-note { text-align: center; font-size: 11px; color: #aaa; padding-bottom: 12px; }
+
+  /* Success */
+  .success-card { margin: 12px 16px; background: linear-gradient(135deg, #E8F5E9, #F9FBE7); border: 1.5px solid #C8E6C9; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .sc-icon { width: 52px; height: 52px; border-radius: 50%; background: #4CAF50; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 14px rgba(76,175,80,0.3); }
+  .sc-title { font-size: 15px; font-weight: 800; color: #2E7D32; }
+  .sc-sub { font-size: 12px; color: #81C784; text-align: center; }
+  .result-card { background: #fff; margin: 0 16px 12px; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.07); border: 1.5px solid #C8E6C9; }
+  .rc-header { padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f5f5f5; }
+  .rc-icon { width: 38px; height: 38px; border-radius: 11px; background: #F1F8E9; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .rc-name { flex: 1; font-size: 14px; font-weight: 700; color: #1a1a1a; }
+  .rc-badge { font-size: 10px; font-weight: 700; background: #E8F5E9; color: #4CAF50; padding: 2px 8px; border-radius: 7px; }
+  .rc-kcal-row { padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f5f5f5; }
+  .rc-kcal { font-size: 18px; font-weight: 800; color: #4CAF50; }
+  .rc-serving { font-size: 11px; color: #aaa; }
+  .rc-macros { display: flex; padding: 10px 16px; }
+  .rc-m { flex: 1; text-align: center; }
+  .rc-m:not(:last-child) { border-right: 1px solid #f5f5f5; }
+  .rc-m-val { font-size: 13px; font-weight: 700; }
+  .rc-m-lbl { font-size: 10px; color: #aaa; margin-top: 1px; }
+  .action-btn { margin: 0 16px 10px; padding: 13px; border-radius: 13px; text-align: center; font-size: 13px; font-weight: 700; cursor: pointer; }
+  .action-btn.primary { background: #4CAF50; color: #fff; box-shadow: 0 3px 10px rgba(76,175,80,0.25); }
+  .action-btn.secondary { background: #f5f5f5; color: #555; }
+  .tip-box { margin: 0 16px 10px; background: #f8f8f8; border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; }
+  .tip-box .tip-emoji { font-size: 16px; }
+  .tip-title { font-size: 12px; font-weight: 700; color: #555; }
+  .tip-sub { font-size: 11px; color: #aaa; margin-top: 1px; }
+
+  /* Toast */
+  .toast {
+    position: absolute; bottom: 98px; left: 50%; transform: translateX(-50%);
+    background: #1a1a1a; color: #fff; font-size: 12px; font-weight: 600;
+    padding: 9px 18px; border-radius: 20px; white-space: nowrap; z-index: 20;
+    display: flex; align-items: center; gap: 6px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  .t-check { width: 18px; height: 18px; border-radius: 50%; background: #4CAF50; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<h1>🥗 Diet App</h1>
+<p class="subtitle">화면을 탭해서 이동하세요</p>
+
+<!-- 화면 선택 탭 -->
+<div class="screen-tabs">
+  <div class="screen-tab active" onclick="showScreen('home')">🏠 Home</div>
+  <div class="screen-tab" onclick="showScreen('diary')">📋 Diary</div>
+  <div class="screen-tab" onclick="showScreen('analysis')">📊 Analysis</div>
+  <div class="screen-tab" onclick="showScreen('settings')">⚙️ Settings</div>
+  <div class="screen-tab" onclick="showScreen('food-list')">🍽️ 내 음식</div>
+  <div class="screen-tab" onclick="showScreen('food-register')">✏️ 음식 등록</div>
+  <div class="screen-tab" onclick="showScreen('food-complete')">✅ 등록 완료</div>
+</div>
+
+<div class="phone">
+
+  <!-- ══════════ HOME ══════════ -->
+  <div class="view active" id="view-home">
+    <div class="status-bar"><span class="time">9:41</span><span style="font-size:12px;color:#888">●●●</span></div>
+    <div class="scroll-area">
+      <div class="top-bar">
+        <div><div class="home-greeting">좋은 아침이에요 👋</div><div class="home-date">2월 28일 금요일</div></div>
+        <div class="home-avatar">N</div>
+      </div>
+      <!-- Calorie Ring -->
+      <div class="calorie-section">
+        <div class="section-label-sm">오늘의 칼로리</div>
+        <div style="margin-top:12px" class="ring-container">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 100 100"><circle class="ring-bg" cx="50" cy="50" r="45"/><circle class="ring-fill" cx="50" cy="50" r="45"/></svg>
+            <div class="ring-center"><div class="kcal-num">1,240</div><div class="kcal-label">kcal</div></div>
+          </div>
+          <div class="calorie-info">
+            <div class="calorie-goal">
+              <div class="calorie-item consumed"><div class="val">1,240</div><div class="lbl">섭취</div></div>
+              <div class="divider-v"></div>
+              <div class="calorie-item"><div class="val">2,000</div><div class="lbl">목표</div></div>
+              <div class="divider-v"></div>
+              <div class="calorie-item remain"><div class="val">760</div><div class="lbl">남은</div></div>
+            </div>
+            <div style="text-align:center"><span class="chip">목표의 62% 달성</span></div>
+          </div>
+        </div>
+      </div>
+      <!-- Macros -->
+      <div class="macro-section">
+        <div class="section-label-sm">영양소</div>
+        <div style="margin-top:10px">
+          <div class="macro-row"><div class="macro-name">탄수</div><div class="macro-bar-wrap"><div class="macro-bar" style="width:65%;background:#FF9800"></div></div><div class="macro-val" style="color:#FF9800">156/250g</div></div>
+          <div class="macro-row"><div class="macro-name">단백</div><div class="macro-bar-wrap"><div class="macro-bar" style="width:72%;background:#2196F3"></div></div><div class="macro-val" style="color:#2196F3">72/100g</div></div>
+          <div class="macro-row"><div class="macro-name">지방</div><div class="macro-bar-wrap"><div class="macro-bar" style="width:48%;background:#F44336"></div></div><div class="macro-val" style="color:#F44336">32/67g</div></div>
+          <div class="macro-row"><div class="macro-name">식이</div><div class="macro-bar-wrap"><div class="macro-bar" style="width:55%;background:#9C27B0"></div></div><div class="macro-val" style="color:#9C27B0">14/25g</div></div>
+        </div>
+      </div>
+      <!-- Meals -->
+      <div class="meals-section">
+        <div class="meals-header"><span>끼니 기록</span><a href="#" onclick="navTo('diary');return false;">전체보기</a></div>
+        <div class="meal-card"><div class="meal-icon breakfast">🌅</div><div class="meal-info"><div class="meal-name">아침</div><div class="meal-foods">잡곡밥, 된장찌개, 계란후라이</div></div><div class="meal-kcal">580 <span>kcal</span></div></div>
+        <div class="meal-card"><div class="meal-icon lunch">☀️</div><div class="meal-info"><div class="meal-name">점심</div><div class="meal-foods">닭가슴살 샐러드, 고구마</div></div><div class="meal-kcal">660 <span>kcal</span></div></div>
+        <div class="meal-add" onclick="navTo('diary')"><div class="add-icon">+</div><div class="add-text">저녁 기록하기</div></div>
+        <div class="meal-add" onclick="navTo('diary')"><div class="add-icon">+</div><div class="add-text">간식 기록하기</div></div>
+      </div>
+      <!-- Weekly Chart -->
+      <div class="section-card" style="margin-bottom:16px">
+        <div class="section-header"><div class="section-title">이번 주 칼로리</div><div class="section-sub" style="background:#f5f5f5;padding:4px 10px;border-radius:20px;">평균 1,820 kcal</div></div>
+        <div class="bar-chart">
+          <div class="bar-group"><div class="bar achieved" style="height:62px"></div><div class="bar-day">월</div></div>
+          <div class="bar-group"><div class="bar over" style="height:75px"></div><div class="bar-day">화</div></div>
+          <div class="bar-group"><div class="bar achieved" style="height:58px"></div><div class="bar-day">수</div></div>
+          <div class="bar-group"><div class="bar achieved" style="height:65px"></div><div class="bar-day">목</div></div>
+          <div class="bar-group"><div class="bar today" style="height:50px"></div><div class="bar-day today-label">오늘</div></div>
+          <div class="bar-group"><div class="bar empty" style="height:4px"></div><div class="bar-day">토</div></div>
+          <div class="bar-group"><div class="bar empty" style="height:4px"></div><div class="bar-day">일</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active" onclick="navTo('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-label">홈</div></div>
+      <div class="nav-item" onclick="navTo('diary')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="nav-label">식단</div></div>
+      <div class="nav-item" onclick="navTo('analysis')"><div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="nav-label">분석</div></div>
+      <div class="nav-item" onclick="navTo('settings')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="nav-label">설정</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ DIARY ══════════ -->
+  <div class="view" id="view-diary">
+    <div class="status-bar"><span class="time">9:41</span><span style="font-size:12px;color:#888">●●●</span></div>
+    <div class="top-bar"><div class="title">식단 일지</div><div class="icon-btn"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div>
+    <div class="week-calendar">
+      <div class="day-cell"><div class="day-name">월</div><div class="day-num">24</div><div class="dot"></div></div>
+      <div class="day-cell"><div class="day-name">화</div><div class="day-num">25</div><div class="dot"></div></div>
+      <div class="day-cell"><div class="day-name">수</div><div class="day-num">26</div><div class="dot"></div></div>
+      <div class="day-cell"><div class="day-name">목</div><div class="day-num">27</div><div class="dot"></div></div>
+      <div class="day-cell active"><div class="day-name">금</div><div class="day-num">28</div><div class="dot"></div></div>
+      <div class="day-cell"><div class="day-name">토</div><div class="day-num">29</div><div class="dot empty"></div></div>
+      <div class="day-cell"><div class="day-name">일</div><div class="day-num">1</div><div class="dot empty"></div></div>
+    </div>
+    <div class="scroll-area">
+      <div class="date-header"><div class="date-text">2025년 2월 28일 금요일</div><div class="total-kcal">총 1,240 kcal</div></div>
+      <div class="meal-block">
+        <div class="meal-block-header"><div class="meal-block-left"><div class="meal-emoji breakfast">🌅</div><div><div class="meal-title">아침</div><div class="meal-subtitle">오전 8:20</div></div></div><div class="meal-kcal-badge">580 <span>kcal</span></div></div>
+        <div class="food-item"><div class="food-color-dot" style="background:#FF9800"></div><div class="food-name-wrap"><div class="food-name">잡곡밥</div><div class="food-amount">210g · 탄 68g · 단 7g · 지 2g</div></div><div class="food-kcal">320 kcal</div></div>
+        <div class="food-item"><div class="food-color-dot" style="background:#2196F3"></div><div class="food-name-wrap"><div class="food-name">된장찌개</div><div class="food-amount">300g · 탄 8g · 단 12g · 지 4g</div></div><div class="food-kcal">140 kcal</div></div>
+        <div class="food-item"><div class="food-color-dot" style="background:#F44336"></div><div class="food-name-wrap"><div class="food-name">계란후라이</div><div class="food-amount">60g · 탄 0g · 단 8g · 지 9g</div></div><div class="food-kcal">120 kcal</div></div>
+        <div class="add-food-btn" onclick="openSheet()"><div class="plus">+</div>음식 추가</div>
+      </div>
+      <div class="meal-block">
+        <div class="meal-block-header"><div class="meal-block-left"><div class="meal-emoji lunch">☀️</div><div><div class="meal-title">점심</div><div class="meal-subtitle">오후 12:45</div></div></div><div class="meal-kcal-badge">660 <span>kcal</span></div></div>
+        <div class="food-item"><div class="food-color-dot" style="background:#4CAF50"></div><div class="food-name-wrap"><div class="food-name">닭가슴살 샐러드</div><div class="food-amount">350g · 탄 12g · 단 38g · 지 8g</div></div><div class="food-kcal">480 kcal</div></div>
+        <div class="food-item"><div class="food-color-dot" style="background:#FF9800"></div><div class="food-name-wrap"><div class="food-name">고구마</div><div class="food-amount">130g · 탄 32g · 단 2g · 지 0g</div></div><div class="food-kcal">180 kcal</div></div>
+        <div class="add-food-btn" onclick="openSheet()"><div class="plus">+</div>음식 추가</div>
+      </div>
+      <div class="meal-empty" onclick="openSheet()"><div class="meal-empty-icon">🌙</div><div class="meal-empty-text"><div class="name">저녁</div><div class="hint">+ 탭하여 저녁 식사를 기록하세요</div></div></div>
+      <div class="meal-empty" onclick="openSheet()"><div class="meal-empty-icon">🍎</div><div class="meal-empty-text"><div class="name">간식</div><div class="hint">+ 탭하여 간식을 기록하세요</div></div></div>
+      <div style="height:80px"></div>
+    </div>
+    <!-- FAB -->
+    <div class="fab" onclick="openSheet()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+    <!-- Dim -->
+    <div class="dim-overlay" id="diary-dim" onclick="closeSheet()"></div>
+    <!-- Bottom Sheet -->
+    <div class="bottom-sheet" id="diary-sheet" style="height:320px">
+      <div class="bs-handle"></div>
+      <div class="bs-header">
+        <div><div class="bs-title">내 음식 추가</div><div class="bs-subtitle">끼니에 추가 중</div></div>
+        <div class="bs-new-btn" onclick="navTo('food-list')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>새 음식 등록</div>
+      </div>
+      <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>내 음식 검색...</span></div>
+      <div class="search-result"><div class="sr-icon">🍗</div><div class="sr-info"><div class="sr-name">닭가슴살 (삶은)</div><div class="sr-detail">100g 기준 · 165 kcal · 단 31g</div></div><div class="sr-add" onclick="addFood()">+</div></div>
+      <div class="search-result"><div class="sr-icon">🥚</div><div class="sr-info"><div class="sr-name">계란후라이</div><div class="sr-detail">60g 기준 · 120 kcal · 단 8g</div></div><div class="sr-add" onclick="addFood()">+</div></div>
+      <div class="search-result"><div class="sr-icon">🌾</div><div class="sr-info"><div class="sr-name">잡곡밥</div><div class="sr-detail">210g 기준 · 320 kcal · 탄 68g</div></div><div class="sr-add" onclick="addFood()">+</div></div>
+    </div>
+    <!-- Toast -->
+    <div class="toast" id="diary-toast"><div class="t-check">✓</div>닭가슴살이 추가됐어요</div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="navTo('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-label">홈</div></div>
+      <div class="nav-item active" onclick="navTo('diary')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="nav-label">식단</div></div>
+      <div class="nav-item" onclick="navTo('analysis')"><div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="nav-label">분석</div></div>
+      <div class="nav-item" onclick="navTo('settings')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="nav-label">설정</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ ANALYSIS ══════════ -->
+  <div class="view" id="view-analysis">
+    <div class="status-bar"><span class="time">9:41</span><span style="font-size:12px;color:#888">●●●</span></div>
+    <div class="top-bar"><div class="title">영양 분석</div><div style="font-size:12px;color:#4CAF50;font-weight:700;background:#E8F5E9;padding:5px 12px;border-radius:20px">2월</div></div>
+    <div class="tab-selector"><div class="atab active">주간</div><div class="atab">월간</div></div>
+    <div class="scroll-area">
+      <div class="summary-row">
+        <div class="summary-card"><div class="s-label">평균 칼로리</div><div class="s-val green">1,820</div><div class="s-unit">kcal / 일</div></div>
+        <div class="summary-card"><div class="s-label">목표 달성</div><div class="s-val orange">5/7</div><div class="s-unit">일 달성</div></div>
+        <div class="summary-card"><div class="s-label">총 섭취</div><div class="s-val">12,740</div><div class="s-unit">kcal 이번주</div></div>
+      </div>
+      <div class="section-card">
+        <div class="section-header"><div class="section-title">주간 칼로리</div><div class="section-sub">목표 2,000 kcal</div></div>
+        <div class="bar-chart">
+          <div class="bar-group"><div class="bar achieved" style="height:78px"></div><div class="bar-day">월</div></div>
+          <div class="bar-group"><div class="bar over" style="height:92px"></div><div class="bar-day">화</div></div>
+          <div class="bar-group"><div class="bar achieved" style="height:71px"></div><div class="bar-day">수</div></div>
+          <div class="bar-group"><div class="bar over" style="height:82px"></div><div class="bar-day">목</div></div>
+          <div class="bar-group"><div class="bar today" style="height:50px"></div><div class="bar-day today-label">오늘</div></div>
+          <div class="bar-group"><div class="bar empty" style="height:4px"></div><div class="bar-day">토</div></div>
+          <div class="bar-group"><div class="bar empty" style="height:4px"></div><div class="bar-day">일</div></div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header"><div class="section-title">매크로 비율</div><div class="section-sub">이번 주 평균</div></div>
+        <div class="macro-pie-row">
+          <div class="pie-wrap">
+            <svg viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#FF9800" stroke-width="3.2" stroke-dasharray="52 48" stroke-dashoffset="25" transform="rotate(-90 18 18)"/>
+              <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#2196F3" stroke-width="3.2" stroke-dasharray="28 72" stroke-dashoffset="-27" transform="rotate(-90 18 18)"/>
+              <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#F44336" stroke-width="3.2" stroke-dasharray="20 80" stroke-dashoffset="-55" transform="rotate(-90 18 18)"/>
+            </svg>
+            <div class="pie-center"><div class="pc-val">1,820</div><div class="pc-lbl">kcal</div></div>
+          </div>
+          <div class="pie-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#FF9800"></div><div class="legend-name">탄수화물</div><div class="legend-gram">238g</div><div class="legend-pct" style="color:#FF9800">52%</div></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#2196F3"></div><div class="legend-name">단백질</div><div class="legend-gram">128g</div><div class="legend-pct" style="color:#2196F3">28%</div></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#F44336"></div><div class="legend-name">지방</div><div class="legend-gram">40g</div><div class="legend-pct" style="color:#F44336">20%</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-header"><div class="section-title">자주 먹은 음식 TOP 5</div><div class="section-sub">이번 주</div></div>
+        <div class="top-food-item"><div class="rank gold">1</div><div class="tf-icon">🍗</div><div class="tf-name">닭가슴살</div><div class="tf-count">6회</div><div class="tf-bar-wrap"><div class="tf-bar" style="width:100%"></div></div></div>
+        <div class="top-food-item"><div class="rank silver">2</div><div class="tf-icon">🌾</div><div class="tf-name">잡곡밥</div><div class="tf-count">5회</div><div class="tf-bar-wrap"><div class="tf-bar" style="width:83%"></div></div></div>
+        <div class="top-food-item"><div class="rank bronze">3</div><div class="tf-icon">🥚</div><div class="tf-name">계란</div><div class="tf-count">4회</div><div class="tf-bar-wrap"><div class="tf-bar" style="width:66%"></div></div></div>
+        <div class="top-food-item"><div class="rank">4</div><div class="tf-icon">🥦</div><div class="tf-name">브로콜리</div><div class="tf-count">3회</div><div class="tf-bar-wrap"><div class="tf-bar" style="width:50%"></div></div></div>
+        <div class="top-food-item"><div class="rank">5</div><div class="tf-icon">🍠</div><div class="tf-name">고구마</div><div class="tf-count">3회</div><div class="tf-bar-wrap"><div class="tf-bar" style="width:50%"></div></div></div>
+      </div>
+      <div class="section-card" style="margin-bottom:16px">
+        <div class="section-header"><div class="section-title">월간 달성 히트맵</div><div class="section-sub">2025년 2월</div></div>
+        <div class="heatmap-grid">
+          <div class="heatmap-day-label">일</div><div class="heatmap-day-label">월</div><div class="heatmap-day-label">화</div><div class="heatmap-day-label">수</div><div class="heatmap-day-label">목</div><div class="heatmap-day-label">금</div><div class="heatmap-day-label">토</div>
+          <div class="heatmap-cell empty">-</div><div class="heatmap-cell empty">-</div><div class="heatmap-cell empty">-</div><div class="heatmap-cell empty">-</div><div class="heatmap-cell empty">-</div><div class="heatmap-cell empty">-</div><div class="heatmap-cell high">1</div>
+          <div class="heatmap-cell mid">2</div><div class="heatmap-cell low">3</div><div class="heatmap-cell high">4</div><div class="heatmap-cell over">5</div><div class="heatmap-cell high">6</div><div class="heatmap-cell mid">7</div><div class="heatmap-cell low">8</div>
+          <div class="heatmap-cell high">9</div><div class="heatmap-cell high">10</div><div class="heatmap-cell mid">11</div><div class="heatmap-cell over">12</div><div class="heatmap-cell high">13</div><div class="heatmap-cell low">14</div><div class="heatmap-cell high">15</div>
+          <div class="heatmap-cell mid">16</div><div class="heatmap-cell high">17</div><div class="heatmap-cell over">18</div><div class="heatmap-cell high">19</div><div class="heatmap-cell mid">20</div><div class="heatmap-cell high">21</div><div class="heatmap-cell low">22</div>
+          <div class="heatmap-cell high">23</div><div class="heatmap-cell mid">24</div><div class="heatmap-cell over">25</div><div class="heatmap-cell high">26</div><div class="heatmap-cell mid">27</div><div class="heatmap-cell today-cell">28</div><div class="heatmap-cell no-data">-</div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:12px;justify-content:center">
+          <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:3px;background:#C8E6C9"></div><span style="font-size:10px;color:#aaa">미달</span></div>
+          <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:3px;background:#4CAF50"></div><span style="font-size:10px;color:#aaa">달성</span></div>
+          <div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:3px;background:#FF8A65"></div><span style="font-size:10px;color:#aaa">초과</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="navTo('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-label">홈</div></div>
+      <div class="nav-item" onclick="navTo('diary')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="nav-label">식단</div></div>
+      <div class="nav-item active" onclick="navTo('analysis')"><div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="nav-label">분석</div></div>
+      <div class="nav-item" onclick="navTo('settings')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="nav-label">설정</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ SETTINGS ══════════ -->
+  <div class="view" id="view-settings">
+    <div class="status-bar"><span class="time">9:41</span><span style="font-size:12px;color:#888">●●●</span></div>
+    <div class="top-bar"><div class="title">설정</div></div>
+    <div class="scroll-area">
+      <div class="profile-card"><div class="profile-avatar">N</div><div class="profile-info"><div class="pname">노승진</div><div class="pemail">noh@example.com</div></div><div class="profile-edit">편집</div></div>
+      <div class="stats-row"><div class="stat-card"><div class="stat-val">28일</div><div class="stat-lbl">연속 기록</div></div><div class="stat-card"><div class="stat-val">73%</div><div class="stat-lbl">목표 달성률</div></div><div class="stat-card"><div class="stat-val">124개</div><div class="stat-lbl">등록된 음식</div></div></div>
+      <div style="font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:0.8px;padding:0 20px 8px">목표 설정</div>
+      <div class="slider-wrap"><div class="slider-header"><div class="slider-title">일일 칼로리 목표</div><div><span class="slider-val">2,000</span> <span class="slider-unit">kcal</span></div></div><div class="slider-track"><div class="slider-fill"></div><div class="slider-thumb"></div></div><div class="slider-labels"><span>1,200 kcal</span><span>3,500 kcal</span></div></div>
+      <div class="settings-group" style="padding:14px 16px;margin-bottom:12px"><div class="item-title" style="margin-bottom:12px">매크로 목표</div><div class="macro-goal-row"><div class="mg-name">탄수</div><div class="mg-track"><div class="mg-fill" style="width:60%;background:#FF9800"></div></div><div class="mg-val" style="color:#FF9800">250g</div></div><div class="macro-goal-row"><div class="mg-name">단백</div><div class="mg-track"><div class="mg-fill" style="width:40%;background:#2196F3"></div></div><div class="mg-val" style="color:#2196F3">100g</div></div><div class="macro-goal-row"><div class="mg-name">지방</div><div class="mg-track"><div class="mg-fill" style="width:28%;background:#F44336"></div></div><div class="mg-val" style="color:#F44336">67g</div></div></div>
+      <div style="font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:0.8px;padding:0 20px 8px">알림</div>
+      <div class="settings-group"><div class="settings-item"><div class="item-icon" style="background:#E3F2FD">🔔</div><div class="item-content"><div class="item-title">식사 알림</div><div class="item-sub">아침 8:00 · 점심 12:00 · 저녁 18:00</div></div><div class="toggle"></div></div><div class="settings-item"><div class="item-icon" style="background:#F3E5F5">📊</div><div class="item-content"><div class="item-title">주간 리포트</div><div class="item-sub">매주 일요일 오전 9시</div></div><div class="toggle"></div></div><div class="settings-item"><div class="item-icon" style="background:#E8F5E9">🎯</div><div class="item-content"><div class="item-title">목표 초과 알림</div><div class="item-sub">칼로리 목표 초과 시</div></div><div class="toggle off"></div></div></div>
+      <div style="font-size:11px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:0.8px;padding:0 20px 8px">계정</div>
+      <div class="settings-group"><div class="settings-item"><div class="item-icon" style="background:#E8F5E9">👤</div><div class="item-content"><div class="item-title">계정 설정</div><div class="item-sub">프로필 수정, 비밀번호 변경</div></div><div class="chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div><div class="settings-item"><div class="item-icon" style="background:#F3E5F5">🌙</div><div class="item-content"><div class="item-title">다크 모드</div><div class="item-sub">시스템 설정 따름</div></div><div class="item-right"><div class="item-val">자동</div><div class="chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div></div></div>
+      <div style="height:16px"></div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="navTo('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-label">홈</div></div>
+      <div class="nav-item" onclick="navTo('diary')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="nav-label">식단</div></div>
+      <div class="nav-item" onclick="navTo('analysis')"><div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="nav-label">분석</div></div>
+      <div class="nav-item active" onclick="navTo('settings')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="nav-label">설정</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ FOOD LIST ══════════ -->
+  <div class="view" id="view-food-list">
+    <div class="status-bar"><span class="time">9:41</span><span style="font-size:12px;color:#888">●●●</span></div>
+    <div class="back-top-bar"><div class="back-btn" onclick="navTo('diary')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="btitle">내 음식 추가</div></div>
+    <div style="padding:10px 16px;background:#fff;border-bottom:1px solid #f0f0f0;flex-shrink:0"><div style="display:flex;align-items:center;background:#f5f5f5;border-radius:12px;padding:10px 14px;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span style="font-size:14px;color:#aaa">내 음식 검색...</span></div></div>
+    <div class="scroll-area">
+      <div class="register-banner" onclick="navTo('food-register')"><div class="rb-icon">✏️</div><div class="rb-text"><div class="rb-title">새 음식 직접 등록하기</div><div class="rb-sub">원하는 음식이 없으면 직접 추가해요</div></div><div class="rb-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div>
+      <div class="section-label-food">내가 등록한 음식 (5)</div>
+      <div class="food-list-item"><div class="fli-icon">🍗</div><div class="fli-info"><div class="fli-name">닭가슴살 (삶은)</div><div class="fli-detail">100g · 165 kcal · 단 31g</div></div><div class="fli-add">+</div></div>
+      <div class="food-list-item"><div class="fli-icon">🌾</div><div class="fli-info"><div class="fli-name">잡곡밥</div><div class="fli-detail">210g · 320 kcal · 탄 68g</div></div><div class="fli-add">+</div></div>
+      <div class="food-list-item"><div class="fli-icon">🥚</div><div class="fli-info"><div class="fli-name">계란후라이</div><div class="fli-detail">60g · 120 kcal · 단 8g</div></div><div class="fli-add">+</div></div>
+      <div class="food-list-item"><div class="fli-icon">🥦</div><div class="fli-info"><div class="fli-name">브로콜리 (데침)</div><div class="fli-detail">150g · 52 kcal · 식이 4g</div></div><div class="fli-add">+</div></div>
+      <div class="food-list-item"><div class="fli-icon">🍠</div><div class="fli-info"><div class="fli-name">고구마 (찐)</div><div class="fli-detail">130g · 180 kcal · 탄 42g</div></div><div class="fli-add">+</div></div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="navTo('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-label">홈</div></div>
+      <div class="nav-item active" onclick="navTo('diary')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="nav-label">식단</div></div>
+      <div class="nav-item" onclick="navTo('analysis')"><div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="nav-label">분석</div></div>
+      <div class="nav-item" onclick="navTo('settings')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="nav-label">설정</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ FOOD REGISTER ══════════ -->
+  <div class="view" id="view-food-register">
+    <div class="status-bar"><span class="time">9:41</span><span style="font-size:12px;color:#888">●●●</span></div>
+    <div class="back-top-bar"><div class="back-btn" onclick="navTo('food-list')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="btitle">새 음식 등록</div><div class="save-btn-top disabled">저장</div></div>
+    <div class="scroll-area">
+      <div class="form-wrap">
+        <div class="emoji-row"><div class="emoji-big">🌾</div><div class="emoji-hint"><strong>이모지 선택</strong><span>탭해서 음식 이모지를 골라보세요</span></div></div>
+        <div class="input-group"><div class="input-label">음식 이름 <span class="req">*</span></div><div class="input-field focused"><span class="val">오트밀 프로틴볼</span><span style="width:1.5px;height:14px;background:#4CAF50;display:inline-block;animation:blink 1s infinite"></span></div></div>
+        <div class="two-col">
+          <div class="input-group"><div class="input-label">1회 제공량 <span class="req">*</span></div><div class="input-field filled"><span class="val">45</span><span class="unit">g</span></div></div>
+          <div class="input-group"><div class="input-label">칼로리 (자동)</div><div class="kcal-auto empty"><span class="val">—</span><span class="unit">kcal</span></div></div>
+        </div>
+        <div class="input-label" style="margin-bottom:8px">영양소 (1회 제공량 기준)</div>
+        <div class="macro-grid">
+          <div class="macro-card filled-carb"><div class="mc-label"><div class="mc-dot" style="background:#FF9800"></div><span style="color:#FF9800">탄수화물</span></div><div class="mc-val-row"><span class="mc-val">28</span><span class="mc-unit">g</span></div></div>
+          <div class="macro-card focused"><div class="mc-label"><div class="mc-dot" style="background:#2196F3"></div><span style="color:#2196F3">단백질</span></div><div class="mc-val-row"><span class="mc-val">12</span><span class="mc-cursor"></span><span class="mc-unit">g</span></div></div>
+          <div class="macro-card"><div class="mc-label"><div class="mc-dot" style="background:#F44336"></div><span style="color:#bbb">지방</span></div><div class="mc-val-row"><span class="mc-empty">미입력</span></div></div>
+          <div class="macro-card"><div class="mc-label"><div class="mc-dot" style="background:#9C27B0"></div><span style="color:#bbb">식이섬유</span></div><div class="mc-val-row"><span class="mc-empty">미입력</span></div></div>
+        </div>
+        <div class="calc-hint"><svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span>지방까지 입력하면 칼로리가 자동 계산돼요 · 탄×4 + 단×4 + 지×9</span></div>
+        <div class="save-full disabled" onclick="navTo('food-complete')">저장하기</div>
+        <div class="save-note">이름·제공량·탄수·단백·지방 입력 시 저장 가능</div>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="navTo('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-label">홈</div></div>
+      <div class="nav-item active" onclick="navTo('diary')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="nav-label">식단</div></div>
+      <div class="nav-item" onclick="navTo('analysis')"><div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="nav-label">분석</div></div>
+      <div class="nav-item" onclick="navTo('settings')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="nav-label">설정</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════ FOOD COMPLETE ══════════ -->
+  <div class="view" id="view-food-complete">
+    <div class="status-bar"><span class="time">9:41</span><span style="font-size:12px;color:#888">●●●</span></div>
+    <div class="back-top-bar"><div class="back-btn" onclick="navTo('food-list')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div><div class="btitle">새 음식 등록</div></div>
+    <div class="scroll-area">
+      <div class="success-card"><div class="sc-icon">✓</div><div class="sc-title">음식이 등록됐어요!</div><div class="sc-sub">이제 내 음식 목록에서 바로 찾을 수 있어요</div></div>
+      <div class="result-card">
+        <div class="rc-header"><div class="rc-icon">🌾</div><div class="rc-name">오트밀 프로틴볼</div><div class="rc-badge">내 음식</div></div>
+        <div class="rc-kcal-row"><div class="rc-kcal">212 kcal</div><div class="rc-serving">1회 제공량 45g 기준</div></div>
+        <div class="rc-macros">
+          <div class="rc-m"><div class="rc-m-val" style="color:#FF9800">28g</div><div class="rc-m-lbl">탄수화물</div></div>
+          <div class="rc-m"><div class="rc-m-val" style="color:#2196F3">12g</div><div class="rc-m-lbl">단백질</div></div>
+          <div class="rc-m"><div class="rc-m-val" style="color:#F44336">7g</div><div class="rc-m-lbl">지방</div></div>
+          <div class="rc-m"><div class="rc-m-val" style="color:#9C27B0">3g</div><div class="rc-m-lbl">식이섬유</div></div>
+        </div>
+      </div>
+      <div class="action-btn primary" onclick="navTo('diary')">저녁에 바로 추가하기</div>
+      <div class="action-btn secondary" onclick="navTo('food-list')">나중에 추가할게요</div>
+      <div class="tip-box"><span class="tip-emoji">💡</span><div><div class="tip-title">내 음식 목록에서 수정·삭제 가능</div><div class="tip-sub">음식 정보가 틀렸으면 언제든 수정할 수 있어요</div></div></div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="navTo('home')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="nav-label">홈</div></div>
+      <div class="nav-item active" onclick="navTo('diary')"><div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div class="nav-label">식단</div></div>
+      <div class="nav-item" onclick="navTo('analysis')"><div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="nav-label">분석</div></div>
+      <div class="nav-item" onclick="navTo('settings')"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div class="nav-label">설정</div></div>
+    </div>
+  </div>
+
+</div><!-- end phone -->
+
+<script>
+  const screenMap = {
+    'home': 'view-home',
+    'diary': 'view-diary',
+    'analysis': 'view-analysis',
+    'settings': 'view-settings',
+    'food-list': 'view-food-list',
+    'food-register': 'view-food-register',
+    'food-complete': 'view-food-complete',
+  };
+  const tabLabels = {
+    'home': '🏠 Home',
+    'diary': '📋 Diary',
+    'analysis': '📊 Analysis',
+    'settings': '⚙️ Settings',
+    'food-list': '🍽️ 내 음식',
+    'food-register': '✏️ 음식 등록',
+    'food-complete': '✅ 등록 완료',
+  };
+
+  function showScreen(name) {
+    // hide all views
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(screenMap[name]).classList.add('active');
+    // update top tabs
+    document.querySelectorAll('.screen-tab').forEach(t => {
+      t.classList.toggle('active', t.textContent.trim() === tabLabels[name]);
+    });
+    // close sheet if open
+    closeSheet();
+  }
+
+  function navTo(name) {
+    showScreen(name);
+  }
+
+  // Bottom Sheet
+  function openSheet() {
+    document.getElementById('diary-dim').classList.add('show');
+    document.getElementById('diary-sheet').classList.add('show');
+  }
+  function closeSheet() {
+    const dim = document.getElementById('diary-dim');
+    const sheet = document.getElementById('diary-sheet');
+    if (dim) dim.classList.remove('show');
+    if (sheet) sheet.classList.remove('show');
+  }
+
+  // 음식 추가 토스트
+  function addFood() {
+    closeSheet();
+    const toast = document.getElementById('diary-toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diet App - Diary</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: #fff;
+    border-radius: 48px;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+    overflow: hidden;
+    position: relative;
+    border: 10px solid #1a1a1a;
+  }
+  .status-bar {
+    background: #fff;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 700; }
+  .screen {
+    height: calc(844px - 44px - 82px);
+    overflow-y: auto;
+    background: #FAFAFA;
+    scrollbar-width: none;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* Top Bar */
+  .top-bar {
+    background: #fff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .top-bar .title { font-size: 20px; font-weight: 800; color: #1a1a1a; }
+  .top-bar .icon-btn {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: #f5f5f5;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .top-bar .icon-btn svg { width: 20px; height: 20px; stroke: #555; }
+
+  /* Weekly Calendar */
+  .week-calendar {
+    background: #fff;
+    padding: 12px 16px;
+    display: flex;
+    gap: 6px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .day-cell {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  .day-cell.active {
+    background: #4CAF50;
+  }
+  .day-cell .day-name { font-size: 10px; color: #aaa; font-weight: 600; }
+  .day-cell.active .day-name { color: rgba(255,255,255,0.8); }
+  .day-cell .day-num { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .day-cell.active .day-num { color: #fff; }
+  .day-cell .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #4CAF50;
+  }
+  .day-cell.active .dot { background: rgba(255,255,255,0.6); }
+  .day-cell .dot.empty { background: transparent; }
+
+  /* Date Header */
+  .date-header {
+    padding: 14px 20px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .date-header .date-text { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+  .date-header .total-kcal {
+    font-size: 13px; color: #4CAF50; font-weight: 700;
+    background: #E8F5E9; padding: 4px 12px; border-radius: 20px;
+  }
+
+  /* Meal Block */
+  .meal-block {
+    background: #fff;
+    margin: 0 16px 10px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .meal-block-header {
+    padding: 14px 16px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f8f8f8;
+  }
+  .meal-block-left { display: flex; align-items: center; gap: 10px; }
+  .meal-emoji {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .meal-emoji.breakfast { background: #FFF3E0; }
+  .meal-emoji.lunch { background: #E8F5E9; }
+  .meal-emoji.dinner { background: #E3F2FD; }
+  .meal-title { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+  .meal-subtitle { font-size: 11px; color: #aaa; margin-top: 1px; }
+  .meal-kcal-badge {
+    font-size: 14px; font-weight: 700; color: #555;
+  }
+  .meal-kcal-badge span { font-size: 11px; color: #aaa; font-weight: 400; }
+
+  /* Food Items */
+  .food-item {
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #f8f8f8;
+  }
+  .food-item:last-child { border-bottom: none; }
+  .food-color-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .food-name-wrap { flex: 1; }
+  .food-name { font-size: 13px; font-weight: 600; color: #333; }
+  .food-amount { font-size: 11px; color: #aaa; margin-top: 1px; }
+  .food-kcal { font-size: 13px; font-weight: 700; color: #555; }
+
+  /* Add Food Button */
+  .add-food-btn {
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #4CAF50;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .add-food-btn .plus {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #E8F5E9;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; line-height: 1;
+  }
+
+  /* Empty Meal */
+  .meal-empty {
+    background: #fff;
+    margin: 0 16px 10px;
+    border-radius: 20px;
+    border: 2px dashed #e8e8e8;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .meal-empty-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: #f5f5f5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .meal-empty-text .name { font-size: 14px; font-weight: 600; color: #ccc; }
+  .meal-empty-text .hint { font-size: 11px; color: #ddd; margin-top: 2px; }
+
+  /* FAB tooltip */
+  .fab-tooltip {
+    position: absolute;
+    bottom: 162px; right: 20px;
+    background: #1a1a1a; color: #fff;
+    font-size: 11px; font-weight: 600;
+    padding: 6px 12px; border-radius: 8px;
+    white-space: nowrap; z-index: 6;
+  }
+  .fab-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -5px; right: 18px;
+    width: 10px; height: 10px;
+    background: #1a1a1a;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  /* Bottom Sheet overlay */
+  .bottom-sheet-overlay {
+    position: absolute;
+    bottom: 82px;
+    left: 0; right: 0;
+    height: 340px;
+    background: #fff;
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.12);
+    z-index: 10;
+    padding: 0 16px 16px;
+  }
+  .bs-handle {
+    width: 36px; height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    margin: 10px auto 12px;
+  }
+  .bs-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .bs-title { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+  .bs-subtitle { font-size: 11px; color: #aaa; margin-top: 2px; }
+  .bs-new-btn {
+    display: flex; align-items: center; gap: 5px;
+    background: #E8F5E9; color: #4CAF50;
+    font-size: 12px; font-weight: 700;
+    padding: 6px 12px; border-radius: 10px;
+  }
+  .bs-new-btn svg { width: 14px; height: 14px; stroke: #4CAF50; fill: none; stroke-width: 2.5; stroke-linecap: round; }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 10px 14px;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .search-box svg { width: 18px; height: 18px; stroke: #aaa; flex-shrink: 0; fill: none; stroke-width: 2; stroke-linecap: round; }
+  .search-box span { font-size: 14px; color: #aaa; }
+
+  .search-result {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5;
+    gap: 12px;
+  }
+  .search-result:last-child { border-bottom: none; }
+  .sr-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: #f5f5f5;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .sr-info { flex: 1; }
+  .sr-name { font-size: 13px; font-weight: 600; color: #333; }
+  .sr-detail { font-size: 11px; color: #aaa; margin-top: 1px; }
+  .sr-add {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: #4CAF50;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 18px; font-weight: 300; line-height: 1;
+  }
+
+  /* Dim */
+  .dim {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 9;
+  }
+
+  /* FAB */
+  .fab {
+    position: absolute;
+    bottom: 98px;
+    right: 20px;
+    width: 52px; height: 52px;
+    border-radius: 16px;
+    background: #4CAF50;
+    box-shadow: 0 4px 16px rgba(76,175,80,0.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 5;
+  }
+  .fab svg { width: 24px; height: 24px; stroke: #fff; stroke-width: 2.5; }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    height: 82px;
+    background: #fff;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: 16px;
+  }
+  .nav-item {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 4px; flex: 1;
+  }
+  .nav-icon svg { width: 24px; height: 24px; }
+  .nav-label { font-size: 11px; font-weight: 500; color: #bbb; }
+  .nav-item.active .nav-label { color: #4CAF50; font-weight: 700; }
+  .nav-item.active .nav-icon svg { stroke: #4CAF50; }
+  .nav-item:not(.active) .nav-icon svg { stroke: #bbb; fill: none; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <span style="font-size:12px;color:#888">●●●</span>
+  </div>
+
+  <div class="screen">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="title">식단 일지</div>
+      <div style="display:flex;gap:8px">
+        <div class="icon-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Calendar -->
+    <div class="week-calendar">
+      <div class="day-cell">
+        <div class="day-name">월</div>
+        <div class="day-num">24</div>
+        <div class="dot"></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">화</div>
+        <div class="day-num">25</div>
+        <div class="dot"></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">수</div>
+        <div class="day-num">26</div>
+        <div class="dot"></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">목</div>
+        <div class="day-num">27</div>
+        <div class="dot"></div>
+      </div>
+      <div class="day-cell active">
+        <div class="day-name">금</div>
+        <div class="day-num">28</div>
+        <div class="dot"></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">토</div>
+        <div class="day-num">29</div>
+        <div class="dot empty"></div>
+      </div>
+      <div class="day-cell">
+        <div class="day-name">일</div>
+        <div class="day-num">1</div>
+        <div class="dot empty"></div>
+      </div>
+    </div>
+
+    <!-- Date Header -->
+    <div class="date-header">
+      <div class="date-text">2025년 2월 28일 금요일</div>
+      <div class="total-kcal">총 1,240 kcal</div>
+    </div>
+
+    <!-- 아침 -->
+    <div class="meal-block">
+      <div class="meal-block-header">
+        <div class="meal-block-left">
+          <div class="meal-emoji breakfast">🌅</div>
+          <div>
+            <div class="meal-title">아침</div>
+            <div class="meal-subtitle">오전 8:20</div>
+          </div>
+        </div>
+        <div class="meal-kcal-badge">580 <span>kcal</span></div>
+      </div>
+      <div class="food-item">
+        <div class="food-color-dot" style="background:#FF9800"></div>
+        <div class="food-name-wrap">
+          <div class="food-name">잡곡밥</div>
+          <div class="food-amount">210g · 탄 68g · 단 7g · 지 2g</div>
+        </div>
+        <div class="food-kcal">320 kcal</div>
+      </div>
+      <div class="food-item">
+        <div class="food-color-dot" style="background:#2196F3"></div>
+        <div class="food-name-wrap">
+          <div class="food-name">된장찌개</div>
+          <div class="food-amount">300g · 탄 8g · 단 12g · 지 4g</div>
+        </div>
+        <div class="food-kcal">140 kcal</div>
+      </div>
+      <div class="food-item">
+        <div class="food-color-dot" style="background:#F44336"></div>
+        <div class="food-name-wrap">
+          <div class="food-name">계란후라이</div>
+          <div class="food-amount">60g · 탄 0g · 단 8g · 지 9g</div>
+        </div>
+        <div class="food-kcal">120 kcal</div>
+      </div>
+      <div class="add-food-btn">
+        <div class="plus">+</div>
+        음식 추가
+      </div>
+    </div>
+
+    <!-- 점심 -->
+    <div class="meal-block">
+      <div class="meal-block-header">
+        <div class="meal-block-left">
+          <div class="meal-emoji lunch">☀️</div>
+          <div>
+            <div class="meal-title">점심</div>
+            <div class="meal-subtitle">오후 12:45</div>
+          </div>
+        </div>
+        <div class="meal-kcal-badge">660 <span>kcal</span></div>
+      </div>
+      <div class="food-item">
+        <div class="food-color-dot" style="background:#4CAF50"></div>
+        <div class="food-name-wrap">
+          <div class="food-name">닭가슴살 샐러드</div>
+          <div class="food-amount">350g · 탄 12g · 단 38g · 지 8g</div>
+        </div>
+        <div class="food-kcal">480 kcal</div>
+      </div>
+      <div class="food-item">
+        <div class="food-color-dot" style="background:#FF9800"></div>
+        <div class="food-name-wrap">
+          <div class="food-name">고구마</div>
+          <div class="food-amount">130g · 탄 32g · 단 2g · 지 0g</div>
+        </div>
+        <div class="food-kcal">180 kcal</div>
+      </div>
+      <div class="add-food-btn">
+        <div class="plus">+</div>
+        음식 추가
+      </div>
+    </div>
+
+    <!-- 저녁 (empty) -->
+    <div class="meal-empty">
+      <div class="meal-empty-icon">🌙</div>
+      <div class="meal-empty-text">
+        <div class="name">저녁</div>
+        <div class="hint">+ 탭하여 저녁 식사를 기록하세요</div>
+      </div>
+    </div>
+
+    <!-- 간식 (empty) -->
+    <div class="meal-empty">
+      <div class="meal-empty-icon">🍎</div>
+      <div class="meal-empty-text">
+        <div class="name">간식</div>
+        <div class="hint">+ 탭하여 간식을 기록하세요</div>
+      </div>
+    </div>
+
+    <div style="height: 80px;"></div>
+  </div>
+
+  <!-- FAB 툴팁 -->
+  <div class="fab-tooltip">음식 추가하기</div>
+
+  <!-- FAB ① -->
+  <div class="fab">
+    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  </div>
+
+  <!-- Dim -->
+  <div class="dim"></div>
+
+  <!-- Bottom Sheet ② -->
+  <div class="bottom-sheet-overlay">
+    <div class="bs-handle"></div>
+    <div class="bs-header">
+      <div>
+        <div class="bs-title">내 음식 추가</div>
+        <div class="bs-subtitle">아침 끼니에 추가 중</div>
+      </div>
+      <!-- ③ 새 음식 등록 버튼 -->
+      <div class="bs-new-btn">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        새 음식 등록
+      </div>
+    </div>
+    <div class="search-box">
+      <svg viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <span>내 음식 검색...</span>
+    </div>
+    <div class="search-result">
+      <div class="sr-icon">🍗</div>
+      <div class="sr-info">
+        <div class="sr-name">닭가슴살 (삶은)</div>
+        <div class="sr-detail">100g 기준 · 165 kcal · 단 31g</div>
+      </div>
+      <div class="sr-add">+</div>
+    </div>
+    <div class="search-result">
+      <div class="sr-icon">🥚</div>
+      <div class="sr-info">
+        <div class="sr-name">계란후라이</div>
+        <div class="sr-detail">60g 기준 · 120 kcal · 단 8g</div>
+      </div>
+      <div class="sr-add">+</div>
+    </div>
+    <div class="search-result">
+      <div class="sr-icon">🌾</div>
+      <div class="sr-info">
+        <div class="sr-name">잡곡밥</div>
+        <div class="sr-detail">210g 기준 · 320 kcal · 탄 68g</div>
+      </div>
+      <div class="sr-add">+</div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <div class="nav-item">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:#bbb">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <div class="nav-label">홈</div>
+    </div>
+    <div class="nav-item active">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:#4CAF50">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+        </svg>
+      </div>
+      <div class="nav-label">식단</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" style="stroke:#bbb">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+      </div>
+      <div class="nav-label">분석</div>
+    </div>
+    <div class="nav-item">
+      <div class="nav-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" style="stroke:#bbb">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+      </div>
+      <div class="nav-label">설정</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
