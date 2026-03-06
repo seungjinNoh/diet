@@ -30,4 +30,8 @@ include(":core:navigation")
 include(":core:database")
 include(":core:domain")
 include(":core:data")
+include(":feature:home")
+include(":feature:diary")
+include(":feature:analysis")
+include(":feature:settings")
  
