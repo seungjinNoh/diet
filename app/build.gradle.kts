@@ -1,6 +1,7 @@
 plugins {
     id("diet.android.application")
     id("diet.android.application.compose")
+    id("diet.android.hilt")
 }
 
 android {
@@ -26,12 +27,21 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:designsystem"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:diary"))
+    implementation(project(":feature:analysis"))
+    implementation(project(":feature:settings"))
+    implementation(project(":core:navigation"))
+
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
