@@ -3,7 +3,7 @@ package com.example.diet.core.data.repository
 import com.example.diet.core.data.mapper.toDomain
 import com.example.diet.core.data.mapper.toEntity
 import com.example.diet.core.database.dao.FoodDao
-import com.example.diet.core.domain.repository.FoodRepository
+import com.example.diet.core.data.repository.FoodRepository
 import com.example.diet.core.model.Food
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

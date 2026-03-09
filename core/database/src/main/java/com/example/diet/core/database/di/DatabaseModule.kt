@@ -7,6 +7,7 @@ import com.example.diet.core.database.dao.DiaryDao
 import com.example.diet.core.database.dao.FoodDao
 import com.example.diet.core.database.dao.MealDao
 import com.example.diet.core.database.dao.MealFoodItemDao
+import com.example.diet.core.database.dao.UserProfileDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,5 +55,11 @@ object DatabaseModule {
     @Singleton
     fun provideMealFoodItemDao(database: DietDatabase): MealFoodItemDao {
         return database.mealFoodItemDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserProfileDao(database: DietDatabase): UserProfileDao {
+        return database.userProfileDao()
     }
 }

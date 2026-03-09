@@ -2,7 +2,7 @@ package com.example.diet.core.data.repository
 
 import com.example.diet.core.data.mapper.UserProfileMapper
 import com.example.diet.core.database.dao.UserProfileDao
-import com.example.diet.core.domain.repository.UserProfileRepository
+import com.example.diet.core.data.repository.UserProfileRepository
 import com.example.diet.core.model.UserProfile
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

@@ -3,9 +3,9 @@ package com.example.diet.core.data.di
 import com.example.diet.core.data.repository.DiaryRepositoryImpl
 import com.example.diet.core.data.repository.FoodRepositoryImpl
 import com.example.diet.core.data.repository.UserProfileRepositoryImpl
-import com.example.diet.core.domain.repository.DiaryRepository
-import com.example.diet.core.domain.repository.FoodRepository
-import com.example.diet.core.domain.repository.UserProfileRepository
+import com.example.diet.core.data.repository.DiaryRepository
+import com.example.diet.core.data.repository.FoodRepository
+import com.example.diet.core.data.repository.UserProfileRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

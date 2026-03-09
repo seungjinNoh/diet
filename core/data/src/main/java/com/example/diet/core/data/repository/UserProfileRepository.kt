@@ -1,4 +1,4 @@
-package com.example.diet.core.domain.repository
+package com.example.diet.core.data.repository
 
 import com.example.diet.core.model.UserProfile
 import kotlinx.coroutines.flow.Flow
