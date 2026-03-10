@@ -80,12 +80,16 @@ fun DietBottomBar(navController: NavController) {
                     label = destination.label,
                     selected = selected,
                     onClick = {
-                        navController.navigate(destination.route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+                        if (destination.route is HomeRoute) {
+                            navController.popBackStack(HomeRoute, inclusive = false)
+                        } else {
+                            navController.navigate(destination.route) {
+                                popUpTo<HomeRoute> {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
                     },
                 )

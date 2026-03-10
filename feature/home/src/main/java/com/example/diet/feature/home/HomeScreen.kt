@@ -59,6 +59,7 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    onNavigateToDiary: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -70,13 +71,13 @@ fun HomeScreen(
             }
         }
         is HomeUiState.Success -> {
-            HomeContent(state = state, modifier = modifier)
+            HomeContent(state = state, modifier = modifier, onNavigateToDiary = onNavigateToDiary)
         }
     }
 }
 
 @Composable
-private fun HomeContent(state: HomeUiState.Success, modifier: Modifier = Modifier) {
+private fun HomeContent(state: HomeUiState.Success, modifier: Modifier = Modifier, onNavigateToDiary: () -> Unit = {}) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -89,7 +90,7 @@ private fun HomeContent(state: HomeUiState.Success, modifier: Modifier = Modifie
         Spacer(modifier = Modifier.height(12.dp))
         MacroBarsCard(diary = state.todayDiary, goals = state.goals)
         Spacer(modifier = Modifier.height(12.dp))
-        MealsSection(diary = state.todayDiary)
+        MealsSection(diary = state.todayDiary, onMealAddClick = onNavigateToDiary)
         Spacer(modifier = Modifier.height(12.dp))
         WeeklyChartCard(
             weeklyDiaries = state.weeklyDiaries,
@@ -209,7 +210,7 @@ private fun MacroBarsCard(diary: Diary?, goals: NutritionGoals) {
 }
 
 @Composable
-private fun MealsSection(diary: Diary?) {
+private fun MealsSection(diary: Diary?, onMealAddClick: () -> Unit = {}) {
     val mealsMap = diary?.meals?.associateBy { it.mealType } ?: emptyMap()
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
@@ -228,7 +229,7 @@ private fun MealsSection(diary: Diary?) {
             if (meal != null) {
                 MealCard(meal = meal)
             } else {
-                MealAddCard(mealName = "${mealType.displayName} 기록하기")
+                MealAddCard(mealName = "${mealType.displayName} 기록하기", onClick = onMealAddClick)
             }
         }
     }

@@ -1,6 +1,8 @@
 package com.example.diet.core.data.repository
 
 import com.example.diet.core.model.Diary
+import com.example.diet.core.model.Food
+import com.example.diet.core.model.MealType
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -12,4 +14,5 @@ interface DiaryRepository {
     suspend fun updateDiary(diary: Diary)
     suspend fun deleteDiary(diaryId: Long)
     suspend fun existsByDate(date: LocalDate): Boolean
+    suspend fun addFoodToMeal(date: LocalDate, mealType: MealType, food: Food, amount: Float)
 }

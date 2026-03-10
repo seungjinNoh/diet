@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.example.diet.core.database.entity.MealEntity
 import com.example.diet.core.database.model.MealWithFoodItems
+import com.example.diet.core.model.MealType
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -27,6 +28,9 @@ interface MealDao {
 
     @Query("SELECT * FROM meals WHERE diaryId = :diaryId")
     fun getMealsByDiaryId(diaryId: Long): Flow<List<MealEntity>>
+
+    @Query("SELECT * FROM meals WHERE diaryId = :diaryId AND mealType = :mealType LIMIT 1")
+    suspend fun getMealByDiaryIdAndType(diaryId: Long, mealType: MealType): MealEntity?
 
     @Transaction
     @Query("SELECT * FROM meals WHERE id = :id")

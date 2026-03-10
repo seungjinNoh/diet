@@ -3,19 +3,28 @@ package com.example.diet.core.data.repository
 import com.example.diet.core.data.mapper.toDomain
 import com.example.diet.core.data.mapper.toEntity
 import com.example.diet.core.database.dao.DiaryDao
+import com.example.diet.core.database.dao.FoodDao
+import com.example.diet.core.database.dao.MealDao
 import com.example.diet.core.database.dao.MealFoodItemDao
+import com.example.diet.core.database.entity.DiaryEntity
+import com.example.diet.core.database.entity.MealEntity
+import com.example.diet.core.database.entity.MealFoodItem
+import com.example.diet.core.database.entity.NutritionInfoEmbedded
 import com.example.diet.core.data.repository.DiaryRepository
 import com.example.diet.core.model.Diary
+import com.example.diet.core.model.Food
+import com.example.diet.core.model.MealType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import javax.inject.Inject
 
 class DiaryRepositoryImpl @Inject constructor(
     private val diaryDao: DiaryDao,
-    private val mealFoodItemDao: MealFoodItemDao
+    private val mealFoodItemDao: MealFoodItemDao,
+    private val mealDao: MealDao,
+    private val foodDao: FoodDao
 ) : DiaryRepository {
 
     override fun getDiaryByDate(date: LocalDate): Flow<Diary?> = flow {
@@ -87,5 +96,67 @@ class DiaryRepositoryImpl @Inject constructor(
 
     override suspend fun existsByDate(date: LocalDate): Boolean {
         return diaryDao.getByDate(date) != null
+    }
+
+    override suspend fun addFoodToMeal(date: LocalDate, mealType: MealType, food: Food, amount: Float) {
+        val scale = amount / food.amount
+        val scaledCalories = (food.calories * scale).toInt()
+        val scaledNutrition = NutritionInfoEmbedded(
+            carbs = food.nutrition.carbs * scale,
+            protein = food.nutrition.protein * scale,
+            fat = food.nutrition.fat * scale,
+            fiber = food.nutrition.fiber * scale
+        )
+
+        // 1. 해당 날짜의 DiaryEntity 조회 또는 생성
+        val diaryEntity = diaryDao.getByDate(date) ?: run {
+            val newDiary = DiaryEntity(date = date)
+            val id = diaryDao.insert(newDiary)
+            diaryDao.getById(id)!!
+        }
+
+        // 2. diary + mealType에 해당하는 MealEntity 조회 또는 생성
+        val existingMeal = mealDao.getMealByDiaryIdAndType(diaryEntity.id, mealType)
+        val mealId: Long
+        if (existingMeal != null) {
+            // 기존 식사 합계 업데이트
+            mealDao.update(
+                existingMeal.copy(
+                    totalCalories = existingMeal.totalCalories + scaledCalories,
+                    totalNutrition = NutritionInfoEmbedded(
+                        carbs = existingMeal.totalNutrition.carbs + scaledNutrition.carbs,
+                        protein = existingMeal.totalNutrition.protein + scaledNutrition.protein,
+                        fat = existingMeal.totalNutrition.fat + scaledNutrition.fat,
+                        fiber = existingMeal.totalNutrition.fiber + scaledNutrition.fiber
+                    )
+                )
+            )
+            mealId = existingMeal.id
+        } else {
+            // 계산된 합계로 새 식사 생성
+            val newMeal = MealEntity(
+                diaryId = diaryEntity.id,
+                mealType = mealType,
+                totalCalories = scaledCalories,
+                totalNutrition = scaledNutrition
+            )
+            mealId = mealDao.insert(newMeal)
+        }
+
+        // 3. MealFoodItem 삽입
+        mealFoodItemDao.insert(MealFoodItem(mealId = mealId, foodId = food.id, amount = amount))
+
+        // 4. DiaryEntity 합계 업데이트
+        diaryDao.update(
+            diaryEntity.copy(
+                totalCalories = diaryEntity.totalCalories + scaledCalories,
+                totalNutrition = NutritionInfoEmbedded(
+                    carbs = diaryEntity.totalNutrition.carbs + scaledNutrition.carbs,
+                    protein = diaryEntity.totalNutrition.protein + scaledNutrition.protein,
+                    fat = diaryEntity.totalNutrition.fat + scaledNutrition.fat,
+                    fiber = diaryEntity.totalNutrition.fiber + scaledNutrition.fiber
+                )
+            )
+        )
     }
 }
