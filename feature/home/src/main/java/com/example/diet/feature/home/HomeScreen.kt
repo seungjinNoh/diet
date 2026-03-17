@@ -116,8 +116,8 @@ private fun HomeTopBar(userName: String, today: LocalDate) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
-            Text(text = greeting, fontSize = 13.sp, color = DietTextMuted)
-            Text(text = dateText, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
+            Text(text = greeting, fontSize = 15.sp, color = DietTextMuted)
+            Text(text = dateText, fontSize = 21.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
         }
         Box(
             modifier = Modifier
@@ -126,7 +126,7 @@ private fun HomeTopBar(userName: String, today: LocalDate) {
                 .background(Brush.linearGradient(colors = listOf(Color(0xFF4CAF50), Color(0xFF8BC34A)))),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = initial, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(text = initial, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
     }
 }
@@ -142,7 +142,7 @@ private fun CalorieRingCard(diary: Diary?, goals: NutritionGoals) {
     DietSectionCard(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = "오늘의 칼로리",
-            fontSize = 13.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
             color = DietTextMuted,
             letterSpacing = 0.5.sp
@@ -181,8 +181,8 @@ private fun CalorieRingCard(diary: Diary?, goals: NutritionGoals) {
 @Composable
 private fun CalorieItem(label: String, value: String, valueColor: Color) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = value, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = valueColor)
-        Text(text = label, fontSize = 11.sp, color = DietTextLight, modifier = Modifier.padding(top = 2.dp))
+        Text(text = value, fontSize = 19.sp, fontWeight = FontWeight.Bold, color = valueColor)
+        Text(text = label, fontSize = 13.sp, color = DietTextLight, modifier = Modifier.padding(top = 2.dp))
     }
 }
 
@@ -193,7 +193,7 @@ private fun MacroBarsCard(diary: Diary?, goals: NutritionGoals) {
     DietSectionCard(modifier = Modifier.padding(horizontal = 16.dp)) {
         Text(
             text = "영양소",
-            fontSize = 13.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
             color = DietTextMuted,
             letterSpacing = 0.5.sp
@@ -219,8 +219,8 @@ private fun MealsSection(diary: Diary?, onMealAddClick: () -> Unit = {}) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "끼니 기록", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
-            Text(text = "전체보기", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = DietGreen)
+            Text(text = "끼니 기록", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
+            Text(text = "전체보기", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DietGreen)
         }
         Spacer(modifier = Modifier.height(10.dp))
         MealType.entries.forEachIndexed { index, mealType ->
@@ -260,7 +260,7 @@ private fun WeeklyChartCard(weeklyDiaries: List<Diary>, today: LocalDate, calori
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "이번 주 칼로리", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
+            Text(text = "이번 주 칼로리", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
             AchievementChip(
                 text = if (avgCalories > 0) "평균 %,d kcal".format(avgCalories) else "기록 없음",
                 color = DietTextMuted,

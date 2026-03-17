@@ -130,7 +130,7 @@ private fun DiaryContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("식단 일지", fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, color = DietTextPrimary)
+            Text("식단 일지", fontSize = 23.sp, fontWeight = FontWeight.ExtraBold, color = DietTextPrimary)
         }
 
         // 주간 캘린더
@@ -160,7 +160,7 @@ private fun DiaryContent(
             ) {
                 Text(
                     text = state.selectedDate.format(DateTimeFormatter.ofPattern("yyyy년 M월 d일 EEEE", Locale.KOREAN)),
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = DietTextPrimary
                 )
@@ -173,7 +173,7 @@ private fun DiaryContent(
                     ) {
                         Text(
                             text = "총 %,d kcal".format(totalCalories),
-                            fontSize = 13.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = DietGreen
                         )
@@ -238,13 +238,13 @@ private fun WeeklyCalendarRow(
             ) {
                 Text(
                     text = dayLabels[index],
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = if (isSelected) Color.White.copy(alpha = 0.8f) else DietTextLight
                 )
                 Text(
                     text = date.dayOfMonth.toString(),
-                    fontSize = 15.sp,
+                    fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (isSelected) Color.White else DietTextPrimary
                 )
@@ -297,15 +297,15 @@ private fun MealBlock(meal: Meal, onAddFoodClick: () -> Unit) {
                     .background(iconBg),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = meal.mealType.emoji, fontSize = 18.sp)
+                Text(text = meal.mealType.emoji, fontSize = 20.sp)
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = meal.mealType.displayName, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
-                meal.time?.let { Text(text = it, fontSize = 11.sp, color = DietTextLight) }
+                Text(text = meal.mealType.displayName, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
+                meal.time?.let { Text(text = it, fontSize = 13.sp, color = DietTextLight) }
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = "%,d".format(meal.totalCalories), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF555555))
-                Text(text = " kcal", fontSize = 11.sp, color = DietTextLight)
+                Text(text = "%,d".format(meal.totalCalories), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF555555))
+                Text(text = " kcal", fontSize = 13.sp, color = DietTextLight)
             }
         }
 
@@ -327,10 +327,10 @@ private fun MealBlock(meal: Meal, onAddFoodClick: () -> Unit) {
                         .background(DietOrange)
                 )
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = food.name, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF333333))
-                    Text(text = "%.0fg".format(food.amount), fontSize = 10.sp, color = DietTextLight)
+                    Text(text = food.name, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF333333))
+                    Text(text = "%.0fg".format(food.amount), fontSize = 12.sp, color = DietTextLight)
                 }
-                Text(text = "%,d kcal".format(food.calories), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF555555))
+                Text(text = "%,d kcal".format(food.calories), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF555555))
             }
             HorizontalDivider(thickness = 1.dp, color = Color(0xFFF8F8F8))
         }
@@ -355,9 +355,9 @@ private fun MealBlock(meal: Meal, onAddFoodClick: () -> Unit) {
                     .background(Color(0xFFE8F5E9)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "+", fontSize = 13.sp, color = DietGreen)
+                Text(text = "+", fontSize = 15.sp, color = DietGreen)
             }
-            Text(text = "음식 추가", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = DietGreen)
+            Text(text = "음식 추가", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DietGreen)
         }
     }
 }
@@ -399,11 +399,11 @@ private fun EmptyMealCard(
                     .background(iconBg),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = mealType.emoji, fontSize = 15.sp)
+                Text(text = mealType.emoji, fontSize = 17.sp)
             }
             Column {
-                Text(text = mealType.displayName, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFFCCCCCC))
-                Text(text = "+ 탭하여 ${mealType.displayName}을 기록하세요", fontSize = 10.sp, color = Color(0xFFDDDDDD))
+                Text(text = mealType.displayName, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFFCCCCCC))
+                Text(text = "+ 탭하여 ${mealType.displayName}을 기록하세요", fontSize = 12.sp, color = Color(0xFFDDDDDD))
             }
         }
     }
@@ -428,8 +428,8 @@ private fun FoodSearchSheetContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("음식 추가", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
-                Text(mealType.displayName, fontSize = 10.sp, color = DietTextLight)
+                Text("음식 추가", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
+                Text(mealType.displayName, fontSize = 12.sp, color = DietTextLight)
             }
             Box(
                 modifier = Modifier
@@ -439,7 +439,7 @@ private fun FoodSearchSheetContent(
                     .clickable(onClick = onDismiss),
                 contentAlignment = Alignment.Center
             ) {
-                Text("✕", fontSize = 14.sp, color = Color(0xFF888888))
+                Text("✕", fontSize = 16.sp, color = Color(0xFF888888))
             }
         }
 
@@ -453,7 +453,7 @@ private fun FoodSearchSheetContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text("🔍", fontSize = 14.sp, color = DietTextLight)
+            Text("🔍", fontSize = 16.sp, color = DietTextLight)
             BasicTextField(
                 value = query,
                 onValueChange = {
@@ -461,11 +461,11 @@ private fun FoodSearchSheetContent(
                     onQueryChange(it)
                 },
                 modifier = Modifier.weight(1f),
-                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 13.sp, color = DietTextPrimary),
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp, color = DietTextPrimary),
                 cursorBrush = SolidColor(DietGreen),
                 singleLine = true,
                 decorationBox = { inner ->
-                    if (query.isEmpty()) Text("음식 검색...", fontSize = 13.sp, color = Color(0xFFBBBBBB))
+                    if (query.isEmpty()) Text("음식 검색...", fontSize = 15.sp, color = Color(0xFFBBBBBB))
                     inner()
                 }
             )
@@ -492,13 +492,13 @@ private fun FoodSearchSheetContent(
                     .background(DietGreen),
                 contentAlignment = Alignment.Center
             ) {
-                Text("✏️", fontSize = 16.sp)
+                Text("✏️", fontSize = 18.sp)
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text("새 음식 직접 등록하기", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
-                Text("원하는 음식이 없으면 직접 추가해요", fontSize = 10.sp, color = Color(0xFF81C784))
+                Text("새 음식 직접 등록하기", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                Text("원하는 음식이 없으면 직접 추가해요", fontSize = 12.sp, color = Color(0xFF81C784))
             }
-            Text("›", fontSize = 18.sp, color = Color(0xFFA5D6A7))
+            Text("›", fontSize = 20.sp, color = Color(0xFFA5D6A7))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -509,18 +509,18 @@ private fun FoodSearchSheetContent(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("🍽️", fontSize = 36.sp)
+                    Text("🍽️", fontSize = 40.sp)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         if (query.isBlank()) "아직 등록된 음식이 없어요" else "'$query' 검색 결과가 없어요",
-                        fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color(0xFF333333)
+                        fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF333333)
                     )
-                    Text("위 버튼으로 음식을 직접 등록해보세요", fontSize = 12.sp, color = DietTextLight)
+                    Text("위 버튼으로 음식을 직접 등록해보세요", fontSize = 14.sp, color = DietTextLight)
                 }
             }
         } else {
             if (query.isBlank()) {
-                Text("내가 등록한 음식 (${searchResults.size})", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = DietTextLight, modifier = Modifier.padding(vertical = 6.dp))
+                Text("내가 등록한 음식 (${searchResults.size})", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = DietTextLight, modifier = Modifier.padding(vertical = 6.dp))
             }
             LazyColumn(modifier = Modifier.heightIn(max = 300.dp)) {
                 items(searchResults) { food ->
@@ -542,11 +542,11 @@ private fun FoodSearchSheetContent(
                                 .background(Color(0xFFF5F5F5)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(food.emoji, fontSize = 16.sp)
+                            Text(food.emoji, fontSize = 18.sp)
                         }
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(food.name, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF333333))
-                            Text("%.0fg 기준 · %,d kcal".format(food.amount, food.calories), fontSize = 10.sp, color = DietTextLight)
+                            Text(food.name, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF333333))
+                            Text("%.0fg 기준 · %,d kcal".format(food.amount, food.calories), fontSize = 12.sp, color = DietTextLight)
                         }
                         Box(
                             modifier = Modifier
@@ -555,7 +555,7 @@ private fun FoodSearchSheetContent(
                                 .background(DietGreen),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("+", fontSize = 16.sp, color = Color.White)
+                            Text("+", fontSize = 18.sp, color = Color.White)
                         }
                     }
                     HorizontalDivider(thickness = 1.dp, color = Color(0xFFF5F5F5))
@@ -589,7 +589,7 @@ private fun AmountInputSheetContent(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("섭취량 입력", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
+            Text("섭취량 입력", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
             Box(
                 modifier = Modifier
                     .size(26.dp)
@@ -598,7 +598,7 @@ private fun AmountInputSheetContent(
                     .clickable(onClick = onDismiss),
                 contentAlignment = Alignment.Center
             ) {
-                Text("✕", fontSize = 14.sp, color = Color(0xFF888888))
+                Text("✕", fontSize = 16.sp, color = Color(0xFF888888))
             }
         }
 
@@ -619,19 +619,19 @@ private fun AmountInputSheetContent(
                     .background(Color.White),
                 contentAlignment = Alignment.Center
             ) {
-                Text(food.emoji, fontSize = 20.sp)
+                Text(food.emoji, fontSize = 22.sp)
             }
             Column(modifier = Modifier.weight(1f)) {
-                Text(food.name, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
-                Text("기준 %.0fg · %,d kcal".format(food.amount, food.calories), fontSize = 11.sp, color = Color(0xFF888888))
+                Text(food.name, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
+                Text("기준 %.0fg · %,d kcal".format(food.amount, food.calories), fontSize = 13.sp, color = Color(0xFF888888))
             }
-            Text("%,d kcal".format(scaledCalories), fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = DietGreen)
+            Text("%,d kcal".format(scaledCalories), fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = DietGreen)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // 섭취량 입력
-        Text("섭취량 (g)", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF555555))
+        Text("섭취량 (g)", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF555555))
         Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -646,7 +646,7 @@ private fun AmountInputSheetContent(
                     .clickable { onAmountChange(-10f) },
                 contentAlignment = Alignment.Center
             ) {
-                Text("−", fontSize = 20.sp, color = Color(0xFF555555))
+                Text("−", fontSize = 22.sp, color = Color(0xFF555555))
             }
             Box(
                 modifier = Modifier
@@ -658,8 +658,8 @@ private fun AmountInputSheetContent(
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("%.0f".format(amount), fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = DietTextPrimary)
-                    Text(" g", fontSize = 12.sp, color = DietTextLight)
+                    Text("%.0f".format(amount), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = DietTextPrimary)
+                    Text(" g", fontSize = 14.sp, color = DietTextLight)
                 }
             }
             Box(
@@ -670,7 +670,7 @@ private fun AmountInputSheetContent(
                     .clickable { onAmountChange(10f) },
                 contentAlignment = Alignment.Center
             ) {
-                Text("+", fontSize = 20.sp, color = Color(0xFF555555))
+                Text("+", fontSize = 22.sp, color = Color(0xFF555555))
             }
         }
 
@@ -695,8 +695,8 @@ private fun AmountInputSheetContent(
                         .padding(vertical = 7.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("${value}g", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, color = color)
-                    Text(label, fontSize = 9.sp, color = DietTextLight)
+                    Text("${value}g", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = color)
+                    Text(label, fontSize = 11.sp, color = DietTextLight)
                 }
             }
         }
@@ -715,7 +715,7 @@ private fun AmountInputSheetContent(
         ) {
             Text(
                 "${mealType.displayName}에 추가하기",
-                fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White
+                fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White
             )
         }
 

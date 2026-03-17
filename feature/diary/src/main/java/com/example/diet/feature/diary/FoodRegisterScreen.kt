@@ -76,11 +76,11 @@ fun FoodRegisterScreen(
                     ),
                 contentAlignment = Alignment.Center
             ) {
-                Text("‹", fontSize = 20.sp, color = Color(0xFF555555), fontWeight = FontWeight.Light)
+                Text("‹", fontSize = 22.sp, color = Color(0xFF555555), fontWeight = FontWeight.Light)
             }
             Text(
                 "새 음식 등록",
-                fontSize = 15.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = DietTextPrimary,
                 modifier = Modifier.weight(1f)
@@ -96,7 +96,7 @@ fun FoodRegisterScreen(
             ) {
                 Text(
                     "저장",
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (canSave) Color.White else Color(0xFFCCCCCC)
                 )
@@ -129,11 +129,11 @@ fun FoodRegisterScreen(
                         ) { showEmojiPicker = true },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(emoji, fontSize = 26.sp)
+                    Text(emoji, fontSize = 28.sp)
                 }
                 Column {
-                    Text("이모지 선택", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = DietGreen)
-                    Text("탭해서 음식 이모지를 골라보세요", fontSize = 10.sp, color = DietTextLight)
+                    Text("이모지 선택", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = DietGreen)
+                    Text("탭해서 음식 이모지를 골라보세요", fontSize = 12.sp, color = DietTextLight)
                 }
             }
 
@@ -174,7 +174,7 @@ fun FoodRegisterScreen(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         "칼로리 (자동)",
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF777777),
                         modifier = Modifier.padding(bottom = 5.dp)
@@ -200,11 +200,11 @@ fun FoodRegisterScreen(
                         ) {
                             Text(
                                 text = autoCalories?.toString() ?: "—",
-                                fontSize = if (autoCalories != null) 14.sp else 12.sp,
+                                fontSize = if (autoCalories != null) 16.sp else 14.sp,
                                 fontWeight = if (autoCalories != null) FontWeight.ExtraBold else FontWeight.Normal,
                                 color = if (autoCalories != null) DietGreen else Color(0xFFCCCCCC)
                             )
-                            Text("kcal", fontSize = 10.sp, color = if (autoCalories != null) Color(0xFF81C784) else DietTextLight)
+                            Text("kcal", fontSize = 12.sp, color = if (autoCalories != null) Color(0xFF81C784) else DietTextLight)
                         }
                     }
                 }
@@ -215,7 +215,7 @@ fun FoodRegisterScreen(
             // 영양소 입력 그리드
             Text(
                 "영양소 (1회 제공량 기준)",
-                fontSize = 10.sp,
+                fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF777777),
                 modifier = Modifier.padding(bottom = 7.dp)
@@ -240,13 +240,13 @@ fun FoodRegisterScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(if (allMacrosFilled) "✓" else "ℹ", fontSize = 14.sp, color = if (allMacrosFilled) Color.White else Color(0xFFAAAAAA))
+                Text(if (allMacrosFilled) "✓" else "ℹ", fontSize = 16.sp, color = if (allMacrosFilled) Color.White else Color(0xFFAAAAAA))
                 Text(
                     text = if (allMacrosFilled && autoCalories != null)
                         "탄${carbs}×4 + 단${protein}×4 + 지${fat}×9 = ${autoCalories} kcal"
                     else
                         "지방까지 입력하면 칼로리가 자동 계산돼요 · 탄×4 + 단×4 + 지×9",
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                     color = if (allMacrosFilled) Color.White.copy(alpha = 0.9f) else Color(0xFFAAAAAA)
                 )
             }
@@ -267,7 +267,7 @@ fun FoodRegisterScreen(
             ) {
                 Text(
                     "저장하고 ${mealType.displayName}에 추가하기",
-                    fontSize = 13.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (canSave) Color.White else Color(0xFFCCCCCC)
                 )
@@ -286,7 +286,7 @@ fun FoodRegisterScreen(
                     .padding(vertical = 12.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text("나중에 추가할게요", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFF555555))
+                Text("나중에 추가할게요", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFF555555))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -306,16 +306,16 @@ private fun FormInputField(
 ) {
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(label, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color(0xFF777777))
-            if (required) Text(" *", fontSize = 12.sp, color = DietRed)
+            Text(label, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF777777))
+            if (required) Text(" *", fontSize = 14.sp, color = DietRed)
         }
         Spacer(modifier = Modifier.height(5.dp))
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier.fillMaxWidth().height(52.dp),
-            placeholder = { Text(placeholder, fontSize = 12.sp, color = Color(0xFFCCCCCC)) },
-            suffix = suffix?.let { { Text(it, fontSize = 10.sp, color = DietTextLight) } },
+            placeholder = { Text(placeholder, fontSize = 14.sp, color = Color(0xFFCCCCCC)) },
+            suffix = suffix?.let { { Text(it, fontSize = 12.sp, color = DietTextLight) } },
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             singleLine = true,
             shape = RoundedCornerShape(10.dp),
@@ -325,7 +325,7 @@ private fun FormInputField(
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color(0xFFF8F8F8)
             ),
-            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = DietTextPrimary)
+            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DietTextPrimary)
         )
     }
 }
@@ -365,25 +365,25 @@ private fun MacroCard(label: String, value: String, onValueChange: (String) -> U
             modifier = Modifier.padding(bottom = 6.dp)
         ) {
             Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(color))
-            Text(label, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = if (filled) color else Color(0xFFAAAAAA))
+            Text(label, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = if (filled) color else Color(0xFFAAAAAA))
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 modifier = Modifier.weight(1f),
-                textStyle = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = DietTextPrimary),
+                textStyle = TextStyle(fontSize = 17.sp, fontWeight = FontWeight.ExtraBold, color = DietTextPrimary),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 singleLine = true,
                 cursorBrush = SolidColor(DietGreen),
                 decorationBox = { innerTextField ->
                     Box {
-                        if (value.isEmpty()) Text("0", fontSize = 15.sp, color = Color(0xFFCCCCCC))
+                        if (value.isEmpty()) Text("0", fontSize = 17.sp, color = Color(0xFFCCCCCC))
                         innerTextField()
                     }
                 }
             )
-            Text("g", fontSize = 10.sp, color = DietTextLight)
+            Text("g", fontSize = 12.sp, color = DietTextLight)
         }
     }
 }
@@ -412,7 +412,7 @@ private fun EmojiPickerBottomSheet(
         Column(modifier = Modifier.padding(horizontal = 16.dp).navigationBarsPadding()) {
             Text(
                 "음식 이모지 선택",
-                fontSize = 14.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = DietTextPrimary,
                 modifier = Modifier.padding(bottom = 12.dp)
@@ -435,7 +435,7 @@ private fun EmojiPickerBottomSheet(
                             ) { onEmojiSelected(emoji) },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(emoji, fontSize = 22.sp)
+                        Text(emoji, fontSize = 24.sp)
                     }
                 }
             }
