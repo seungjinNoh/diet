@@ -1,6 +1,9 @@
 package com.example.diet.feature.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +22,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -90,7 +94,7 @@ private fun HomeContent(state: HomeUiState.Success, modifier: Modifier = Modifie
         Spacer(modifier = Modifier.height(12.dp))
         MacroBarsCard(diary = state.todayDiary, goals = state.goals)
         Spacer(modifier = Modifier.height(12.dp))
-        MealsSection(diary = state.todayDiary, onMealAddClick = onNavigateToDiary)
+        MealsSection(diary = state.todayDiary, onMealAddClick = onNavigateToDiary, onViewAllClick = onNavigateToDiary)
         Spacer(modifier = Modifier.height(12.dp))
         WeeklyChartCard(
             weeklyDiaries = state.weeklyDiaries,
@@ -210,8 +214,10 @@ private fun MacroBarsCard(diary: Diary?, goals: NutritionGoals) {
 }
 
 @Composable
-private fun MealsSection(diary: Diary?, onMealAddClick: () -> Unit = {}) {
+private fun MealsSection(diary: Diary?, onMealAddClick: () -> Unit = {}, onViewAllClick: () -> Unit = {}) {
     val mealsMap = diary?.meals?.associateBy { it.mealType } ?: emptyMap()
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
         Row(
@@ -220,7 +226,17 @@ private fun MealsSection(diary: Diary?, onMealAddClick: () -> Unit = {}) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "끼니 기록", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = DietTextPrimary)
-            Text(text = "전체보기", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = DietGreen)
+            Text(
+                text = "전체보기",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = DietGreen.copy(alpha = if (isPressed) 0.6f else 1f),
+                modifier = Modifier.clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onViewAllClick
+                )
+            )
         }
         Spacer(modifier = Modifier.height(10.dp))
         MealType.entries.forEachIndexed { index, mealType ->
