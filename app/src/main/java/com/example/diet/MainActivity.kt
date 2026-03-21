@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.diet.core.designsystem.theme.DietBackground
 import com.example.diet.core.designsystem.theme.DietTheme
 import com.example.diet.core.navigation.FoodRegisterRoute
 import com.example.diet.navigation.DietBottomBar
@@ -37,6 +39,8 @@ private fun DietApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val showBottomBar = navBackStackEntry?.destination?.hasRoute<FoodRegisterRoute>() == false
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = DietBackground,
         bottomBar = { if (showBottomBar) DietBottomBar(navController) }
     ) { innerPadding ->
         DietNavHost(navController = navController, modifier = Modifier.padding(innerPadding))
