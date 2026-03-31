@@ -273,22 +273,6 @@ fun FoodRegisterScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFF5F5F5))
-                    .clickable(enabled = canSave) {
-                        viewModel.saveOnly { onNavigateBack() }
-                    }
-                    .padding(vertical = 12.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("나중에 추가할게요", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color(0xFF555555))
-            }
-
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
