@@ -57,6 +57,7 @@ class SettingsViewModel @Inject constructor(
     fun updateCalorieGoal(goal: Int) {
         viewModelScope.launch {
             try {
+                ensureProfileExists()
                 userProfileRepository.updateCalorieGoal(goal)
             } catch (e: Exception) {
                 _errorMessage.value = "칼로리 목표 업데이트 실패"
@@ -67,6 +68,7 @@ class SettingsViewModel @Inject constructor(
     fun updateMacroGoals(carb: Float, protein: Float, fat: Float, fiber: Float) {
         viewModelScope.launch {
             try {
+                ensureProfileExists()
                 userProfileRepository.updateMacroGoals(carb, protein, fat, fiber)
             } catch (e: Exception) {
                 _errorMessage.value = "매크로 목표 업데이트 실패"
@@ -77,6 +79,7 @@ class SettingsViewModel @Inject constructor(
     fun updateNotificationSettings(settings: NotificationSettings) {
         viewModelScope.launch {
             try {
+                ensureProfileExists()
                 val profile = userProfileRepository.getProfileOnce() ?: return@launch
                 userProfileRepository.updateProfile(profile.copy(notifications = settings))
             } catch (e: Exception) {
@@ -88,6 +91,7 @@ class SettingsViewModel @Inject constructor(
     fun updateDarkMode(darkMode: DarkMode) {
         viewModelScope.launch {
             try {
+                ensureProfileExists()
                 val profile = userProfileRepository.getProfileOnce() ?: return@launch
                 userProfileRepository.updateProfile(
                     profile.copy(appSettings = profile.appSettings.copy(darkMode = darkMode))
@@ -100,6 +104,26 @@ class SettingsViewModel @Inject constructor(
 
     fun clearError() {
         _errorMessage.value = null
+    }
+
+    private suspend fun ensureProfileExists() {
+        val profile = userProfileRepository.getProfileOnce()
+        if (profile == null) {
+            val now = System.currentTimeMillis()
+            userProfileRepository.createProfile(
+                com.example.diet.core.model.UserProfile(
+                    id = 1,
+                    name = "사용자",
+                    email = "",
+                    avatarUrl = null,
+                    goals = NutritionGoals(),
+                    notifications = NotificationSettings(),
+                    appSettings = AppSettings(),
+                    createdAt = now,
+                    updatedAt = now
+                )
+            )
+        }
     }
 
     private fun calculateConsecutiveDays(dates: List<LocalDate>): Int {
